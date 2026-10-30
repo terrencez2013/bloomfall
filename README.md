@@ -44,3 +44,6 @@ Difficulty increase: all enemies have 50% more health and 20% more movement spee
 
 Progressive challenge: enemy health grows by 85% per garden and 10% per wave; damage grows by 32% per garden and 6% per wave. Movement and special-attack frequency also rise, capped at 2.25x and 2.5x respectively. Bloomfall now appears as the large main page title. Loot tables and reward formulas are unchanged.
 
+
+Contact-triggered specials: Thunderbell starts its lightning chain on the enemy physically hit by the petal (1.2-second cooldown). Starburst releases its expanding shockwave at the petal contact point (2.5-second cooldown). Neither activates just because a mob is nearby, and broken petals cannot trigger either effect.
+
