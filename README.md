@@ -41,3 +41,6 @@ Equipment cap: a maximum of 20 petals can be equipped. Older saves with larger l
 
 Difficulty increase: all enemies have 50% more health and 20% more movement speed. Contact and projectile damage are higher, elites charge faster and more often, champions fire faster and more often, and bosses attack more frequently with faster projectiles. Petal loot tables, rarity chances, quantities, nectar, and XP rewards are unchanged by this difficulty update.
 
+
+Progressive challenge: enemy health grows by 85% per garden and 10% per wave; damage grows by 32% per garden and 6% per wave. Movement and special-attack frequency also rise, capped at 2.25x and 2.5x respectively. Bloomfall now appears as the large main page title. Loot tables and reward formulas are unchanged.
+
