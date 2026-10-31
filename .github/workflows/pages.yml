@@ -25,6 +25,17 @@ jobs:
         uses: actions/checkout@v6
       - name: Configure Pages
         uses: actions/configure-pages@v5
+      - name: Version website files to refresh browser caches
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const file = 'dist/index.html';
+          const html = fs.readFileSync(file, 'utf8').replace(
+            /(src|href)="([^"?]+\.(?:js|css))(?:\?[^\"]*)?"/g,
+            (_, attr, path) => `${attr}="${path}?v=${process.env.GITHUB_SHA}"`
+          );
+          fs.writeFileSync(file, html);
+          NODE
       - name: Upload website
         uses: actions/upload-pages-artifact@v4
         with:

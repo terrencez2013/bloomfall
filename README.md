@@ -50,3 +50,6 @@ Contact-triggered specials: Thunderbell starts its lightning chain on the enemy 
 
 Thunderbell now has no lightning cooldown and can trigger on every petal contact. Whirligig has infinite health, cannot break from mobs or projectiles, and shows ∞ HP with a full health bar. The normal equipment-swap delay still applies.
 
+
+Cache refresh: Pages deployments now stamp JavaScript and stylesheet URLs with the deployed commit, so browsers fetch fresh code after each update. The heading confirms Thunderbell's no-cooldown lightning and Whirligig's infinite health.
+
