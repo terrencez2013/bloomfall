@@ -47,3 +47,6 @@ Progressive challenge: enemy health grows by 85% per garden and 10% per wave; da
 
 Contact-triggered specials: Thunderbell starts its lightning chain on the enemy physically hit by the petal (1.2-second cooldown). Starburst releases its expanding shockwave at the petal contact point (2.5-second cooldown). Neither activates just because a mob is nearby, and broken petals cannot trigger either effect.
 
+
+Thunderbell now has no lightning cooldown and can trigger on every petal contact. Whirligig has infinite health, cannot break from mobs or projectiles, and shows ∞ HP with a full health bar. The normal equipment-swap delay still applies.
+
