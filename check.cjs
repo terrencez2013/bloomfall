@@ -55,7 +55,7 @@ s.garden=1;s.wave=1;s.waveKills=0;s.research.fortune=0;s.seeds=0;clearArena();di
 s.bestLevel=100;s.research.slots=100;s.inventory=[{t:0,r:0,n:48}];s.loadout=Array.from({length:48},()=>({t:0,r:0}));petalState=Array.from({length:48},()=>({hp:1,cool:0}));equipSlot=47;syncSlots();if(s.loadout.length!==20||petalState.length!==20||equipSlot!==19||item(0,0).n!==48||available(item(0,0))!==28)throw Error('Old save cap migration loses petals');render();if(!$('slot-progress').textContent.includes('All 20'))throw Error('Slot cap display');const slotResearch=s.research.slots;click({upgrade:'slots'});if(s.research.slots!==slotResearch)throw Error('Research exceeds cap');
 console.log('PASS: 20-slot migration preserves all owned petals and disables further slot research');
 console.log('PASS: auto-equip weakest same-type slot, batch copy limits, retained petals, no downgrade, lower mob XP, elite tuning, unchanged boss drop profiles across 30 gardens');
-s.garden=1;s.wave=1;s.rebirth=0;clearArena();for(let tier=0;tier<=2;tier++){spawn(false,tier);const e=enemies[enemies.length-1];if(Math.abs(e.hp-(30+e.kind*15)*(1+tier*2.5)*1.5)>.001||Math.abs(e.speed-(26+e.kind*8)*(1+tier*.2)*1.2)>.001)throw Error('Increased mob difficulty');}spawn(true);const newBoss=enemies[enemies.length-1];if(newBoss.hp!==975||newBoss.speed!==43.2)throw Error('Increased boss difficulty');
+s.garden=1;s.wave=1;s.rebirth=0;clearArena();for(let tier=0;tier<=2;tier++){spawn(false,tier);const e=enemies[enemies.length-1];if(Math.abs(e.hp-(30+e.kind*15)*(1+tier*2.5)*1.5)>.001||Math.abs(e.speed-(26+e.kind*8)*(1+tier*.2)*1.2)>.001)throw Error('Increased mob difficulty');}spawn(true);const newBoss=enemies[enemies.length-1];if(newBoss.hp!==1350||newBoss.damageScale!==1.3||newBoss.speed!==43.2)throw Error('Increased boss difficulty');
 console.log('PASS: tougher health and speed for regular mobs, elites, champions and bosses');
 const early=difficulty(1,1),later=difficulty(4,1),lateWave=difficulty(4,5);if(early.health!==1||later.health<6||later.damage<2||lateWave.health<=later.health||lateWave.damage<=later.damage||lateWave.attacks<=later.attacks||lateWave.speed<=later.speed)throw Error('Progressive difficulty curve');if(difficulty(100,5).speed>2.25||difficulty(100,5).attacks>2.5)throw Error('Difficulty speed limits');
 console.log('PASS: sharply increasing garden and wave health, damage, speed, and attack pressure');
@@ -70,9 +70,11 @@ rollWaveTrait=chooseWaveTrait;s.garden=2;s.wave=3;s.waveTrait='horde';const base
 s.waveTrait='elites';clearArena();Math.random=()=>0;spawn(false,1);const eliteBoost=enemies[0];s.waveTrait=null;spawn(false,1);if(eliteBoost.hp!==enemies[1].hp*1.75||eliteBoost.damageScale<=enemies[1].damageScale)throw Error('Elite Surge stats');
 s.waveTrait='armored';spawn(true);const bossHealth=enemies[2].hp;s.waveTrait=null;spawn(true);if(enemies[3].hp!==bossHealth)throw Error('Trait changed boss stats');
 s.waveTrait='horde';s.waveKills=quota()-1;die({boss:false,kind:0,tier:0,x:0,y:0});if(s.wave!==4||!waveTrait().name||s.waveTrait==='horde')throw Error('Wave did not get a new modifier');Math.random=savedRandom;
+clearArena();s.waveTrait='horde';update(.001);if(enemies.length!==3)throw Error('Horde must spawn three mobs');while(enemies.length<47)spawn(false,0);spawnClock=0;update(.001);if(enemies.length!==48)throw Error('Horde must respect its cap');
 console.log('PASS: wave modifiers change horde quota and elite stats, leave bosses alone, and rotate on wave clear');
 save();console.log('PASS: combat, drawing, six boss transitions, inventory, XP, research rendering, rebirth and saving');
 `,box);
+
 
 
 
