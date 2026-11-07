@@ -58,3 +58,4 @@ Starburst now has 100 base HP with normal rarity scaling and a 10% chance to rel
 Starburst now has a 20% explosion chance on hit. Each wave rolls one modifier: Horde, Armored, Rush, Frenzy, or Elite Surge. The current modifier is saved with progress and shown next to the wave objective.
 Starburst now has 25 base HP and retains its 20% on-hit explosion chance. The arena uses six vibrant garden palettes, a floral border, and drifting pollen.
 Horde waves spawn three mobs per batch, up to 48 active enemies. Bosses have about 38% more health, deal 30% more damage, and use special attacks more often.
+Bosses now have four times their previous health. Their arrival, special attacks, and defeat trigger bursts of sparks and arena shake. Effects intensify in later gardens and as bosses lose health. Reduced-motion mode disables shake and limits sparks.
