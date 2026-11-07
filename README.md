@@ -54,3 +54,4 @@ Thunderbell now has no lightning cooldown and can trigger on every petal contact
 Cache refresh: Pages deployments now stamp JavaScript and stylesheet URLs with the deployed commit, so browsers fetch fresh code after each update. The heading confirms Thunderbell's no-cooldown lightning and Whirligig's infinite health.
 
 Starburst now triggers on every hit without a special cooldown, and has exactly 1 HP at every rarity. The normal petal regrowth timer still applies.
+Starburst now has 100 base HP with normal rarity scaling and a 10% chance to release its shockwave on contact.
