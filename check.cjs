@@ -60,7 +60,7 @@ console.log('PASS: tougher health and speed for regular mobs, elites, champions 
 const early=difficulty(1,1),later=difficulty(4,1),lateWave=difficulty(4,5);if(early.health!==1||later.health<6||later.damage<2||lateWave.health<=later.health||lateWave.damage<=later.damage||lateWave.attacks<=later.attacks||lateWave.speed<=later.speed)throw Error('Progressive difficulty curve');if(difficulty(100,5).speed>2.25||difficulty(100,5).attacks>2.5)throw Error('Difficulty speed limits');
 console.log('PASS: sharply increasing garden and wave health, damage, speed, and attack pressure');
 for(const type of [9,17]){s.garden=1;s.wave=1;s.bestLevel=1;s.research.slots=0;s.loadout=[{t:type,r:0}];clearArena();angle=0;spawnClock=100;enemies=[{x:player.x+150,y:player.y,r:12,hp:1000,max:1000,speed:0,kind:0,boss:false,t:0,hit:0,slow:0}];for(let j=0;j<5;j++)update(.02);if(arcs.length||novas.length||enemies[0].hp!==1000)throw Error('Special triggered without contact');angle=0;enemies[0].x=player.x+57;update(.001);if(type===9&&arcs.length!==1)throw Error('Thunderbell contact trigger');if(type===17&&novas.length!==1)throw Error('Starburst contact trigger');let effects=type===9?arcs.length:novas.length;triggerHitAbility(0,enemies[0],player.x+57,player.y);if((type===9?arcs.length:novas.length)<=effects)throw Error('Contact special still has a cooldown');effects=type===9?arcs.length:novas.length;damagePetal(0,1000);petalLife(0).ability=0;triggerHitAbility(0,enemies[0],player.x+57,player.y);if((type===9?arcs.length:novas.length)!==effects)throw Error('Broken petal special');}
-s.rebirth=0;if(petalHP({t:17,r:0})!==100||petalHP({t:17,r:1})!==200)throw Error('Starburst health scaling');
+s.rebirth=0;if(petalHP({t:17,r:0})!==25||petalHP({t:17,r:1})!==50)throw Error('Starburst health scaling');
 s.loadout=[{t:17,r:0}];clearArena();Math.random=()=>.2;triggerHitAbility(0,{},0,0);if(novas.length)throw Error('Starburst triggered at the 20% cutoff');Math.random=()=>.199;triggerHitAbility(0,{},0,0);if(novas.length!==1)throw Error('Starburst failed below the 20% cutoff');Math.random=savedRandom;
 console.log('PASS: Starburst and Thunderbell only activate on physical petal hits, allow immediate repeats, and stay inactive while broken');
 s.loadout=[{t:18,r:0}];clearArena();spawnClock=100;for(let j=0;j<10;j++){damagePetal(0,1e20);update(.02);}render();draw();if(petalLife(0).hp!==Infinity||petalHealthRatio(0)!==1||!$('inventory-slots').innerHTML.includes('∞')||$('loadout').innerHTML.includes('NaN'))throw Error('Infinite health display or combat');
@@ -73,6 +73,7 @@ s.waveTrait='horde';s.waveKills=quota()-1;die({boss:false,kind:0,tier:0,x:0,y:0}
 console.log('PASS: wave modifiers change horde quota and elite stats, leave bosses alone, and rotate on wave clear');
 save();console.log('PASS: combat, drawing, six boss transitions, inventory, XP, research rendering, rebirth and saving');
 `,box);
+
 
 
 

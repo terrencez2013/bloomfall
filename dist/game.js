@@ -2,7 +2,7 @@
 const $=id=>document.getElementById(id),TAU=Math.PI*2;
 const TYPES=[['Daisy','✿','#f9faf0','A balanced little fighter.',1],['Rose','❀','#df8c91','Heavy petals with a dangerous edge.',1.65],['Cactus','✦','#719565','Slow-growing, hard-hitting spikes.',2.1],['Honey','⬡','#deb65e','Sweet rewards: +8% nectar per equipped petal.',.85],['Iris','✧','#a395cd','Quick orbit and a longer reach.',1.3],['Clover','☘','#6da580','Restores health while you explore.',.8],['Frost','❄','#83b9c2','Chills enemies on contact.',1.2],['Lotus','❋','#df9cbd','Rare beauty. Extraordinary damage.',2.8]];
 TYPES.push(['Nightshade','☠','#99bd58','Poisons on contact: 65% petal DPS for 3 seconds.',.8],['Thunderbell','ϟ','#86cbea','On every contact, chains lightning through up to 4 enemies. No cooldown.',.9],['Dandelion','➶','#e7d692','Each active petal gives +8% movement and +15% orbit speed.',.75],['Ramroot','➤','#e4a06b','Repels mobs on contact. Bosses resist knockback.',1.15],['Broodbud','⬢','#ba9bd4','Summons a friendly beetle every 5s. Up to 2 per petal.',.5]);
-TYPES.push(['Ember','♨','#ef9364','Contact ignites a 3s burn that spreads damage to nearby mobs.',1.1],['Lodestone','◈','#88b1a8','Doubles pickup reach and pulls nectar to you faster.',.7],['Aegis','◉','#9ab7ed','Each active shield reduces incoming damage by 12%, up to 60%.',.65],['Bloodroot','♥','#d47b8c','Contact damage heals you for 18% of damage dealt.',1.2],['Starburst','✺','#f0c97d','20% chance on hit to release a 220px shockwave for 350% damage. 100 base HP.',.85]);
+TYPES.push(['Ember','♨','#ef9364','Contact ignites a 3s burn that spreads damage to nearby mobs.',1.1],['Lodestone','◈','#88b1a8','Doubles pickup reach and pulls nectar to you faster.',.7],['Aegis','◉','#9ab7ed','Each active shield reduces incoming damage by 12%, up to 60%.',.65],['Bloodroot','♥','#d47b8c','Contact damage heals you for 18% of damage dealt.',1.2],['Starburst','✺','#f0c97d','20% chance on hit to release a 220px shockwave for 350% damage. 25 base HP.',.85]);
 TYPES.push(['Whirligig','≋','#74d3c4','Unbreakable: infinite health. Adds +35% orbit speed, plus 5% per rarity. Stacks up to +300%.',.7]);
 const RELOAD=8;
 const RARITIES=['Common','Unusual','Rare','Epic','Legendary','Mythic','Divine','Transcendent'],RC=['#879579','#6caa64','#629cc0','#a17fc2','#c9a147','#d58089','#6fbdb0','#c184cd'];
@@ -16,7 +16,7 @@ s.mobKills=s.mobKills||{};s.mobDrops=s.mobDrops||{};
 if(!s.expansionPetals){for(let t=13;t<18;t++){const p=s.inventory.find(q=>q.t===t&&q.r===0);if(p)p.n++;else s.inventory.push({t,r:0,n:1});}s.expansionPetals=true;}
 if(!s.whirligigGift){const p=s.inventory.find(q=>q.t===18&&q.r===0);if(p)p.n++;else s.inventory.push({t:18,r:0,n:1});s.whirligigGift=true;}
 let inventoryOpen=false,newPetals=0,petalState=[];
-function petalHP(p){if(p.t===18)return Infinity;return Math.round([7,5,15,9,6,8,7,12,5,6,4,11,6,5,9,12,5,100,5][p.t]*Math.pow(2,p.r)*(1+s.rebirth*.15));}
+function petalHP(p){if(p.t===18)return Infinity;return Math.round([7,5,15,9,6,8,7,12,5,6,4,11,6,5,9,12,5,25,5][p.t]*Math.pow(2,p.r)*(1+s.rebirth*.15));}
 function petalLife(i){const p=s.loadout[i],key=p.t+','+p.r;let life=petalState[i];if(!life||life.key!==key)life=petalState[i]={key,hp:petalHP(p),cool:0};return life;}
 function damagePetal(i,amount){if(s.loadout[i].t===18)return;const life=petalLife(i);if(life.cool>0)return;life.hp=Math.max(0,life.hp-amount);if(life.hp===0){life.cool=RELOAD;const p=s.loadout[i];burst(player.x,player.y,TYPES[p.t][2],7);}}
 function toggleInventory(force){inventoryOpen=force===undefined?!inventoryOpen:force;keys={};pointer=null;$('inventory').classList.toggle('hidden',!inventoryOpen);$('inventory').setAttribute('aria-hidden',String(!inventoryOpen));if(inventoryOpen){newPetals=0;renderCollection();$('close-inventory').focus();}else $('open-inventory').focus();render();}
@@ -85,8 +85,51 @@ function update(dt){elapsed+=dt;for(let i=0;i<s.loadout.length;i++){const life=p
  for(const d of drops){const dx=player.x-d.x,dy=player.y-d.y,l=Math.hypot(dx,dy);if(l<(activeCount(14)?330:170)){const attraction=activeCount(14)?9:6;d.x+=dx*Math.min(1,dt*attraction);d.y+=dy*Math.min(1,dt*attraction);}if(l<24){const honey=1+s.loadout.filter((p,i)=>p.t===3&&petalLife(i).cool===0).length*.08;s.nectar+=d.n*honey;xp(d.xp);d.dead=true;}}drops=drops.filter(d=>!d.dead);if(drops.length>200)drops.splice(0,drops.length-200);for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;}particles=particles.filter(p=>p.life>0);uiClock+=dt;if(uiClock>.25){uiClock=0;render();} }
 function circle(x,y,r,color,stroke){ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fillStyle=color;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke();}}
 function flower(x,y,r=18,face=true){for(let i=0;i<6;i++){let a=i/6*TAU;circle(x+Math.cos(a)*r*.75,y+Math.sin(a)*r*.75,r*.53,'#fffdf0','#d4d5b3');}circle(x,y,r*.7,'#edcd70','#c4a951');if(face){circle(x-4,y-2,1.8,'#505334');circle(x+4,y-2,1.8,'#505334');ctx.beginPath();ctx.arc(x,y+1,4,0,Math.PI);ctx.strokeStyle='#62603c';ctx.stroke();}}
-function draw(){ctx.clearRect(0,0,w,h);ctx.fillStyle=['#e7edd8','#e5eddb','#eeead5','#e2e9da','#e5e5e8','#ece5df'][(s.garden-1)%6];ctx.fillRect(0,0,w,h);ctx.strokeStyle='#7b986010';ctx.lineWidth=1;for(let x=-40;x<w+40;x+=44)for(let y=0;y<h+40;y+=38){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+22,y-13);ctx.lineTo(x+44,y);ctx.lineTo(x+44,y+25);ctx.lineTo(x+22,y+38);ctx.lineTo(x,y+25);ctx.closePath();ctx.stroke();}for(let i=0;i<36;i++){let x=(Math.sin(i*134.4)*.5+.5)*w,y=(Math.cos(i*47.7)*.5+.5)*h;ctx.globalAlpha=.28;ctx.strokeStyle='#8ca36e';ctx.beginPath();ctx.moveTo(x-3,y+4);ctx.lineTo(x,y-2);ctx.lineTo(x+3,y+4);ctx.stroke();if(i%7===0){circle(x+8,y,2,'#e1bf71');circle(x+11,y+1,2,'#fdf9dc');}}ctx.globalAlpha=1;for(const d of drops){circle(d.x,d.y,5,'#e4bf61','#c9ab57');circle(d.x-1,d.y-1,1.4,'#fff1b4');}drawAbilities();for(const e of enemies){drawMob(e);if(e.poisonTime>0)circle(e.x,e.y,e.r+3,'#00000000','#8abb49');if(e.hp<e.max&&!e.boss){ctx.fillStyle='#35462f44';ctx.fillRect(e.x-e.r,e.y-e.r-12,e.r*2,4);ctx.fillStyle='#e69165';ctx.fillRect(e.x-e.r,e.y-e.r-12,e.r*2*e.hp/e.max,4);}}for(const p of shots){circle(p.x,p.y,p.r,'#bc8977','#947059');}const orbit=(keys.ShiftLeft||keys.ShiftRight)?30:(keys.Space||pointer)?93:57;ctx.setLineDash([3,7]);ctx.strokeStyle='#80956626';ctx.beginPath();ctx.arc(player.x,player.y,orbit,0,TAU);ctx.stroke();ctx.setLineDash([]);circle(player.x+2,player.y+7,20,'#6b7b4520');ctx.globalAlpha=invuln>0?.5:1;flower(player.x,player.y);ctx.globalAlpha=1;s.loadout.forEach((p,i)=>{if(petalLife(i).cool>0)return;const a=petalAngle(i),r=orbitRadius(i,orbit)+(p.t===4?12:0),x=player.x+Math.cos(a)*r,y=player.y+Math.sin(a)*r;circle(x+1,y+3,8,'#5d75451a');circle(x,y,10,TYPES[p.t][2],RC[p.r]);ctx.font='15px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=p.t===0?'#bba563':'#fffaf0';ctx.fillText(TYPES[p.t][1],x,y+1);ctx.fillStyle='#44563844';ctx.fillRect(x-10,y+14,20,3);ctx.fillStyle=petalHealthRatio(i)>.3?'#6eaa67':'#d97562';ctx.fillRect(x-10,y+14,20*petalHealthRatio(i),3);});for(const p of particles){ctx.globalAlpha=Math.max(0,p.life);circle(p.x,p.y,2.5,p.c);}ctx.globalAlpha=1;const boss=enemies.find(e=>e.boss);$('bossbar').style.display=boss?'block':'none';if(boss){$('bossname').textContent=BOSSES[boss.kind][0]+' · '+fmt(boss.hp)+' HP';$('bossfill').style.width=100*Math.max(0,boss.hp)/boss.max+'%';}}
+const GARDEN_PALETTES=[
+  ['#efffba','#b9e779','#65ad65','#368d55','#ff74a5','#ffd260'],
+  ['#e6ffc7','#a3e6ad','#52af9a','#248867','#e9a5ff','#fff285'],
+  ['#fff4b2','#f0d087','#c7915f','#89603b','#f87789','#ffe67d'],
+  ['#e5ffd0','#a6dba0','#64a88e','#2e7466','#ffad7d','#f8ef92'],
+  ['#f8ebff','#cfc3f4','#9785cb','#66578f','#ff99d5','#b8fff3'],
+  ['#fff0c9','#f4bbad','#c883a1','#9c587d','#f97494','#ffe698']
+];
+function gardenNoise(n){const v=Math.sin(n*127.1+311.7)*43758.5453;return v-Math.floor(v);}
+function drawGardenBackdrop(){
+  const [light,mid,edge,leaf,pink,gold]=GARDEN_PALETTES[(s.garden-1)%GARDEN_PALETTES.length];
+  const meadow=ctx.createRadialGradient(w*.43,h*.32,0,w*.5,h*.5,Math.hypot(w,h)*.62);
+  meadow.addColorStop(0,light);meadow.addColorStop(.58,mid);meadow.addColorStop(1,edge);
+  ctx.fillStyle=meadow;ctx.fillRect(0,0,w,h);
+  ctx.save();
+  for(let i=0;i<56;i++){
+    const x=gardenNoise(i*3)*w,y=gardenNoise(i*3+1)*h,sz=3+gardenNoise(i*3+2)*5;
+    ctx.globalAlpha=.19;ctx.strokeStyle=leaf;ctx.lineWidth=1.3;
+    ctx.beginPath();ctx.moveTo(x-sz,y+sz);ctx.quadraticCurveTo(x-sz,y,x-sz*1.3,y-sz*.2);
+    ctx.moveTo(x,y+sz);ctx.quadraticCurveTo(x+sz*.45,y,x+sz*.9,y-sz*.6);ctx.stroke();
+    if(i%5===0){ctx.globalAlpha=.53;circle(x+8,y-2,2.1,pink);circle(x+11,y+1,2.5,gold);}
+  }
+  for(let i=0;i<44;i++){
+    const side=i%4,along=gardenNoise(i+80),inset=4+gardenNoise(i+170)*26;
+    const x=side<2?(side===0?inset:w-inset):along*w;
+    const y=side<2?along*h:(side===2?inset:h-inset);
+    const r=4+gardenNoise(i+250)*6;
+    ctx.globalAlpha=.34;ctx.fillStyle=leaf;
+    ctx.beginPath();ctx.ellipse(x-6,y+5,r*1.65,r*.65,-.65,0,TAU);ctx.fill();
+    ctx.beginPath();ctx.ellipse(x+7,y+7,r*1.65,r*.65,.75,0,TAU);ctx.fill();
+    ctx.globalAlpha=.83;
+    for(let j=0;j<5;j++){const a=j*TAU/5;circle(x+Math.cos(a)*r*.62,y+Math.sin(a)*r*.62,r*.48,i%3===0?gold:pink);}
+    circle(x,y,r*.35,'#fff4b9');
+  }
+  for(let i=0;i<18;i++){
+    const x=(gardenNoise(i+400)*w+elapsed*(4+i%4))%w;
+    const y=gardenNoise(i+450)*h+Math.sin(elapsed*.7+i)*11;
+    ctx.globalAlpha=.19+.21*(.5+.5*Math.sin(elapsed*1.5+i));
+    circle(x,y,1+gardenNoise(i+500)*1.7,'#fffceb');
+  }
+  ctx.restore();
+}
+function draw(){drawGardenBackdrop();for(const d of drops){circle(d.x,d.y,5,'#e4bf61','#c9ab57');circle(d.x-1,d.y-1,1.4,'#fff1b4');}drawAbilities();for(const e of enemies){drawMob(e);if(e.poisonTime>0)circle(e.x,e.y,e.r+3,'#00000000','#8abb49');if(e.hp<e.max&&!e.boss){ctx.fillStyle='#35462f44';ctx.fillRect(e.x-e.r,e.y-e.r-12,e.r*2,4);ctx.fillStyle='#e69165';ctx.fillRect(e.x-e.r,e.y-e.r-12,e.r*2*e.hp/e.max,4);}}for(const p of shots){circle(p.x,p.y,p.r,'#bc8977','#947059');}const orbit=(keys.ShiftLeft||keys.ShiftRight)?30:(keys.Space||pointer)?93:57;ctx.setLineDash([3,7]);ctx.strokeStyle='#80956626';ctx.beginPath();ctx.arc(player.x,player.y,orbit,0,TAU);ctx.stroke();ctx.setLineDash([]);circle(player.x+2,player.y+7,20,'#6b7b4520');ctx.globalAlpha=invuln>0?.5:1;flower(player.x,player.y);ctx.globalAlpha=1;s.loadout.forEach((p,i)=>{if(petalLife(i).cool>0)return;const a=petalAngle(i),r=orbitRadius(i,orbit)+(p.t===4?12:0),x=player.x+Math.cos(a)*r,y=player.y+Math.sin(a)*r;circle(x+1,y+3,8,'#5d75451a');circle(x,y,10,TYPES[p.t][2],RC[p.r]);ctx.font='15px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=p.t===0?'#bba563':'#fffaf0';ctx.fillText(TYPES[p.t][1],x,y+1);ctx.fillStyle='#44563844';ctx.fillRect(x-10,y+14,20,3);ctx.fillStyle=petalHealthRatio(i)>.3?'#6eaa67':'#d97562';ctx.fillRect(x-10,y+14,20*petalHealthRatio(i),3);});for(const p of particles){ctx.globalAlpha=Math.max(0,p.life);circle(p.x,p.y,2.5,p.c);}ctx.globalAlpha=1;const boss=enemies.find(e=>e.boss);$('bossbar').style.display=boss?'block':'none';if(boss){$('bossname').textContent=BOSSES[boss.kind][0]+' · '+fmt(boss.hp)+' HP';$('bossfill').style.width=100*Math.max(0,boss.hp)/boss.max+'%';}}
 function frame(time){const dt=Math.min(.04,(time-last)/1000||.016);last=time;if(running&&!paused&&!inventoryOpen&&tab==='garden')update(dt);if(tab==='garden')draw();requestAnimationFrame(frame);}setInterval(save,5000);window.addEventListener('pagehide',save);resize();syncSlots();render();requestAnimationFrame(frame);
+
 
 
 

@@ -8,3 +8,11 @@
 .heading .update-note{display:inline-block;font-size:11px;font-weight:600;color:#3a7259;background:#e3efe1;border:1px solid #c1d8b9;border-radius:7px;padding:8px 12px;margin-top:10px}@media(max-width:600px){.heading .update-note{font-size:10px;line-height:1.7}}
 
 .next .wave-trait{background:#e0e9d4;color:#365438;border-radius:6px;padding:7px 9px;font-weight:700;line-height:1.5}
+body{background:radial-gradient(ellipse at 16% 0,#fff5c9 0,transparent 42%),radial-gradient(ellipse at 96% 32%,#d7f3cf 0,transparent 46%),#f3f7e9}
+header{background:#f6fae9;border-bottom-color:#c8dcad}
+.arena-wrap{border-color:#8db679;box-shadow:0 12px 30px #356b4626}
+#overlay{background:radial-gradient(ellipse at 50% 38%,#fff7c6d9,#def2b5b8 64%,#80b5799c);backdrop-filter:blur(1px)}
+.overlay-flower{color:#edac36;text-shadow:0 3px 0 #c48732,0 0 35px #fff2a1}
+.panel{border-color:#cedfbd;background:#fffff0df}.panel.next{background:#edf7d9}
+.heading .game-title{color:#195e3d;text-shadow:0 3px 0 #c3e2a6}.game-title>span{color:#e3a52b}
+.primary{background:#29754f;border-color:#29754f}.primary:hover{background:#1d6040}
