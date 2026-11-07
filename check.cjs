@@ -4,7 +4,7 @@ const noop=()=>{};const ctx=new Proxy({},{get:(_,key)=>key==="createRadialGradie
 function el(id){if(!elements.has(id))elements.set(id,{style:{},setAttribute:noop,focus:noop,classList:{add:noop,remove:noop,toggle:noop},getBoundingClientRect:()=>({width:900,height:590}),getContext:()=>ctx,addEventListener:noop,querySelector:()=>el(id+'child')});return elements.get(id);}
 const box={console,Math,JSON,devicePixelRatio:1,document:{getElementById:el,querySelectorAll:()=>[],addEventListener:(type,fn)=>handler=fn},window:{addEventListener:noop},localStorage:{getItem:()=>null,setItem:noop},ResizeObserver:class{observe(){}},requestAnimationFrame:noop,setInterval:noop,setTimeout:noop,clearTimeout:noop};vm.createContext(box);vm.runInContext(fs.readFileSync('dist/gallery.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/abilities.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/mobs.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/game.js','utf8'),box);
 box.handler=handler;vm.runInContext(`
-begin();for(let i=0;i<600;i++)update(1/60);draw();
+const chooseWaveTrait=rollWaveTrait;rollWaveTrait=()=>{s.waveTrait=null;};begin();for(let i=0;i<600;i++)update(1/60);draw();
 if(!Number.isFinite(hp)||enemies.length===0)throw Error('Combat simulation failed');
 for(let j=1;j<=6;j++){s.garden=j;enemies=[];spawn(true);let b=enemies[0];b.cool=0;update(.016);draw();b.hp=0;update(.016);if(s.garden!==j+1)throw Error('Boss progression failed '+j);}
 s.inventory=fresh().inventory;s.nectar=10000;tab='petals';render();addPetal(1,0);addPetal(1,0);if(item(1,0).n!==3)throw Error('Inventory');
@@ -61,13 +61,19 @@ const early=difficulty(1,1),later=difficulty(4,1),lateWave=difficulty(4,5);if(ea
 console.log('PASS: sharply increasing garden and wave health, damage, speed, and attack pressure');
 for(const type of [9,17]){s.garden=1;s.wave=1;s.bestLevel=1;s.research.slots=0;s.loadout=[{t:type,r:0}];clearArena();angle=0;spawnClock=100;enemies=[{x:player.x+150,y:player.y,r:12,hp:1000,max:1000,speed:0,kind:0,boss:false,t:0,hit:0,slow:0}];for(let j=0;j<5;j++)update(.02);if(arcs.length||novas.length||enemies[0].hp!==1000)throw Error('Special triggered without contact');angle=0;enemies[0].x=player.x+57;update(.001);if(type===9&&arcs.length!==1)throw Error('Thunderbell contact trigger');if(type===17&&novas.length!==1)throw Error('Starburst contact trigger');let effects=type===9?arcs.length:novas.length;triggerHitAbility(0,enemies[0],player.x+57,player.y);if((type===9?arcs.length:novas.length)<=effects)throw Error('Contact special still has a cooldown');effects=type===9?arcs.length:novas.length;damagePetal(0,1000);petalLife(0).ability=0;triggerHitAbility(0,enemies[0],player.x+57,player.y);if((type===9?arcs.length:novas.length)!==effects)throw Error('Broken petal special');}
 s.rebirth=0;if(petalHP({t:17,r:0})!==100||petalHP({t:17,r:1})!==200)throw Error('Starburst health scaling');
-s.loadout=[{t:17,r:0}];clearArena();Math.random=()=>.1;triggerHitAbility(0,{},0,0);if(novas.length)throw Error('Starburst triggered at the 10% cutoff');Math.random=()=>.099;triggerHitAbility(0,{},0,0);if(novas.length!==1)throw Error('Starburst failed below the 10% cutoff');Math.random=savedRandom;
+s.loadout=[{t:17,r:0}];clearArena();Math.random=()=>.2;triggerHitAbility(0,{},0,0);if(novas.length)throw Error('Starburst triggered at the 20% cutoff');Math.random=()=>.199;triggerHitAbility(0,{},0,0);if(novas.length!==1)throw Error('Starburst failed below the 20% cutoff');Math.random=savedRandom;
 console.log('PASS: Starburst and Thunderbell only activate on physical petal hits, allow immediate repeats, and stay inactive while broken');
 s.loadout=[{t:18,r:0}];clearArena();spawnClock=100;for(let j=0;j<10;j++){damagePetal(0,1e20);update(.02);}render();draw();if(petalLife(0).hp!==Infinity||petalHealthRatio(0)!==1||!$('inventory-slots').innerHTML.includes('∞')||$('loadout').innerHTML.includes('NaN'))throw Error('Infinite health display or combat');
 s.loadout=[{t:9,r:0}];clearArena();enemies=[{x:player.x+57,y:player.y,r:12,hp:1e6,max:1e6,speed:0,kind:0,boss:false,t:0,hit:0,slow:0}];petalLife(0).ability=99;const lightningBefore=enemies[0].hp;for(let j=0;j<10;j++)triggerHitAbility(0,enemies[0],player.x+57,player.y);if(arcs.length!==10||enemies[0].hp>=lightningBefore)throw Error('Unrestricted lightning');
 console.log('PASS: no lightning cooldown, infinite Whirligig health, permanent orbit bonus, and valid infinity displays');
+rollWaveTrait=chooseWaveTrait;s.garden=2;s.wave=3;s.waveTrait='horde';const baseQuota=4+s.wave*2+s.garden;if(quota()!==Math.ceil(baseQuota*1.5))throw Error('Horde quota');
+s.waveTrait='elites';clearArena();Math.random=()=>0;spawn(false,1);const eliteBoost=enemies[0];s.waveTrait=null;spawn(false,1);if(eliteBoost.hp!==enemies[1].hp*1.75||eliteBoost.damageScale<=enemies[1].damageScale)throw Error('Elite Surge stats');
+s.waveTrait='armored';spawn(true);const bossHealth=enemies[2].hp;s.waveTrait=null;spawn(true);if(enemies[3].hp!==bossHealth)throw Error('Trait changed boss stats');
+s.waveTrait='horde';s.waveKills=quota()-1;die({boss:false,kind:0,tier:0,x:0,y:0});if(s.wave!==4||!waveTrait().name||s.waveTrait==='horde')throw Error('Wave did not get a new modifier');Math.random=savedRandom;
+console.log('PASS: wave modifiers change horde quota and elite stats, leave bosses alone, and rotate on wave clear');
 save();console.log('PASS: combat, drawing, six boss transitions, inventory, XP, research rendering, rebirth and saving');
 `,box);
+
 
 
 

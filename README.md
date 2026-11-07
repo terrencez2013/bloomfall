@@ -55,3 +55,4 @@ Cache refresh: Pages deployments now stamp JavaScript and stylesheet URLs with t
 
 Starburst now triggers on every hit without a special cooldown, and has exactly 1 HP at every rarity. The normal petal regrowth timer still applies.
 Starburst now has 100 base HP with normal rarity scaling and a 10% chance to release its shockwave on contact.
+Starburst now has a 20% explosion chance on hit. Each wave rolls one modifier: Horde, Armored, Rush, Frenzy, or Elite Surge. The current modifier is saved with progress and shown next to the wave objective.
