@@ -74,8 +74,15 @@ s.waveTrait='horde';s.waveKills=quota()-1;die({boss:false,kind:0,tier:0,x:0,y:0}
 clearArena();s.waveTrait='horde';update(.001);if(enemies.length!==3)throw Error('Horde must spawn three mobs');while(enemies.length<47)spawn(false,0);spawnClock=0;update(.001);if(enemies.length!==48)throw Error('Horde must respect its cap');
 console.log('PASS: wave modifiers change horde quota and elite stats, leave bosses alone, and rotate on wave clear');
 s.loadout=[{t:0,r:0}];clearArena();hp=100;keys={};elapsed=0;const mobA={},mobB={};hurt(10,mobA);hurt(10,mobA);hurt(10,mobB);if(hp!==80)throw Error('Different mobs must hit independently');elapsed=.999;hurt(10,mobA);if(hp!==80)throw Error('Same mob hit before one second');elapsed=1;hurt(10,mobA);if(hp!==70)throw Error('Same mob cannot hit after one second');
+s.loadout=[{t:0,r:0}];clearArena();angle=0;spawnClock=100;
+enemies=[{x:player.x+57,y:player.y,r:15,hp:1e5,max:1e5,speed:0,kind:0,t:0,hit:0,slow:0}];
+const beforePetalPush=enemies[0].x;update(.01);if(enemies[0].x<=beforePetalPush)throw Error('Ordinary petals must knock enemies back');
+function measureMobPush(r){clearArena();spawnClock=100;hp=100;enemies=[{x:player.x-16,y:player.y,r,hp:1e5,max:1e5,speed:0,kind:0,t:0,hit:0,slow:0,nextPlayerHit:elapsed+1}];const before=player.x;update(.01);return player.x-before;}
+const smallPush=measureMobPush(13),largePush=measureMobPush(38);
+if(smallPush<=0||largePush<=smallPush||hp<100)throw Error('Enemy shove must scale with size, independently of hit cooldown');
 save();console.log('PASS: combat, drawing, six boss transitions, inventory, XP, research rendering, rebirth and saving');
 `,box);
+
 
 
 
