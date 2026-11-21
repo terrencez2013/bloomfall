@@ -2,7 +2,7 @@ const vm=require('node:vm'),fs=require('node:fs'),assert=require('node:assert/st
 const elements=new Map();let handler;
 const noop=()=>{};const ctx=new Proxy({},{get:(_,key)=>key==="createRadialGradient"?()=>({addColorStop:noop}):noop,set:()=>true});
 function el(id){if(!elements.has(id))elements.set(id,{style:{},setAttribute:noop,focus:noop,classList:{add:noop,remove:noop,toggle:noop},getBoundingClientRect:()=>({width:900,height:590}),getContext:()=>ctx,addEventListener:noop,querySelector:()=>el(id+'child')});return elements.get(id);}
-const box={console,Math,JSON,devicePixelRatio:1,document:{getElementById:el,querySelectorAll:()=>[],addEventListener:(type,fn)=>handler=fn},window:{addEventListener:noop},localStorage:{getItem:()=>null,setItem:noop},ResizeObserver:class{observe(){}},requestAnimationFrame:noop,setInterval:noop,setTimeout:noop,clearTimeout:noop};vm.createContext(box);vm.runInContext(fs.readFileSync('dist/gallery.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/abilities.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/mobs.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/game.js','utf8'),box);
+const box={console,Math,JSON,devicePixelRatio:1,document:{getElementById:el,querySelectorAll:()=>[],addEventListener:(type,fn)=>handler=fn},window:{addEventListener:noop},localStorage:{getItem:()=>null,setItem:noop},ResizeObserver:class{observe(){}},requestAnimationFrame:noop,setInterval:noop,setTimeout:noop,clearTimeout:noop};vm.createContext(box);vm.runInContext(fs.readFileSync('dist/gallery.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/abilities.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/mobs.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/bosses.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/game.js','utf8'),box);
 box.handler=handler;vm.runInContext(`
 const chooseWaveTrait=rollWaveTrait;rollWaveTrait=()=>{s.waveTrait=null;};begin();for(let i=0;i<600;i++)update(1/60);draw();
 if(!Number.isFinite(hp)||enemies.length===0)throw Error('Combat simulation failed');
@@ -73,7 +73,7 @@ s.waveTrait='armored';spawn(true);const bossHealth=enemies[2].hp;s.waveTrait=nul
 s.waveTrait='horde';s.waveKills=quota()-1;die({boss:false,kind:0,tier:0,x:0,y:0});if(s.wave!==4||!waveTrait().name||s.waveTrait==='horde')throw Error('Wave did not get a new modifier');Math.random=savedRandom;
 clearArena();s.waveTrait='horde';update(.001);if(enemies.length!==3)throw Error('Horde must spawn three mobs');while(enemies.length<47)spawn(false,0);spawnClock=0;update(.001);if(enemies.length!==48)throw Error('Horde must respect its cap');
 console.log('PASS: wave modifiers change horde quota and elite stats, leave bosses alone, and rotate on wave clear');
-s.loadout=[{t:0,r:0}];clearArena();hp=100;keys={};elapsed=0;const mobA={},mobB={};hurt(10,mobA);hurt(10,mobA);hurt(10,mobB);if(hp!==80)throw Error('Different mobs must hit independently');elapsed=.499;hurt(10,mobA);if(hp!==80)throw Error('Same mob hit before half a second');elapsed=.5;hurt(10,mobA);if(hp!==70)throw Error('Same mob cannot hit after half a second');
+s.loadout=[{t:0,r:0}];clearArena();hp=100;keys={};elapsed=0;const mobA={},mobB={};hurt(10,mobA);hurt(10,mobA);hurt(10,mobB);if(hp!==80)throw Error('Different mobs must hit independently');elapsed=.199;hurt(10,mobA);if(hp!==80)throw Error('Same mob hit before 0.2 seconds');elapsed=.2;hurt(10,mobA);if(hp!==60)throw Error('Second hit must double damage');
 s.loadout=[{t:0,r:0}];clearArena();angle=0;spawnClock=100;
 enemies=[{x:player.x+57,y:player.y,r:15,hp:1e5,max:1e5,speed:0,kind:0,t:0,hit:0,slow:0}];
 const beforePetalPush=enemies[0].x;update(.01);if(enemies[0].x<=beforePetalPush)throw Error('Ordinary petals must knock enemies back');
@@ -132,8 +132,25 @@ if(enemies[0].hp>=1e9)throw Error('Solid summon no longer attacks');
 enemies[0].x=solidBeetle.x;enemies[0].y=solidBeetle.y;resolveSummonCollisions();if(Math.hypot(solidBeetle.x-enemies[0].x,solidBeetle.y-enemies[0].y)<solidBeetle.r+enemies[0].r)throw Error('Exact-center overlap not resolved');
 solidBeetle.x=18;solidBeetle.y=200;enemies[0].x=38;enemies[0].y=200;enemies[0].r=38;enemies[0].boss=true;resolveSummonCollisions();if(Math.hypot(solidBeetle.x-enemies[0].x,solidBeetle.y-enemies[0].y)<56)throw Error('Wall collision phases into boss');
 console.log('PASS: original contact range and solid summon collision during pursuit, overlap and wall contact');
+s.loadout=[{t:0,r:0}];keys={};clearArena();hp=10000;elapsed=0;const comboA={},comboB={};const dealt=[];
+for(let i=0;i<5;i++){elapsed=i*.2;const before=hp;hurt(10,comboA);dealt.push(before-hp);hurt(10,comboA);if(hp!==before-dealt[i])throw Error('Enemy exceeded five hits per second');}
+if(dealt.join(',')!=='10,20,40,80,160')throw Error('Per-enemy doubling incorrect');
+const beforeOther=hp;hurt(10,comboB);if(beforeOther-hp!==10)throw Error('Different mob shared combo');
+elapsed=1;const resetBefore=hp;hurt(10,comboA);if(resetBefore-hp!==10)throw Error('Damage combo did not reset after one second');
+s.level=1;s.garden=1;s.wave=1;s.research=fresh().research;
+for(let k=0;k<6;k++){clearArena();s.garden=k+1;spawn(true);const b=enemies[0];b.x=player.x-170;b.y=player.y;const before=b.hp;bossSpecial(b,170,0,170);
+if(k===0&&(!b.dashWindup||!bossFields.some(f=>f.type==='stomp')))throw Error('Guardian abilities');
+if(k===1&&!bossFields.some(f=>f.type==='thorns'))throw Error('Queen thorns');
+if(k===2&&(enemies.length<4||!bossFields.some(f=>f.type==='honey')))throw Error('Empress abilities');
+if(k===3&&!bossFields.some(f=>f.type==='stomp'))throw Error('Titan stomp');
+if(k===4&&!bossFields.some(f=>f.type==='web'))throw Error('Weaver traps');
+if(k===5){bossSpecial(b,170,0,170);bossSpecial(b,170,0,170);if(!bossFields.some(f=>f.type==='thorns')||!bossFields.some(f=>f.type==='stomp'))throw Error('Eternal phases');}
+draw();}
+clearArena();s.garden=1;hp=maxHP();spawn(true);const trapBoss=enemies[0];bossField(trapBoss,'thorns',player.x,player.y,40,.5,2);const safeHP=hp;updateBossFields(.2);if(hp!==safeHP)throw Error('Telegraph dealt damage');updateBossFields(.31);updateBossFields(.01);if(hp>=safeHP)throw Error('Active thorn trap did not hit');bossField(trapBoss,'web',player.x,player.y,40,0,2);if(bossTerrainSpeed()!==.55)throw Error('Web slow missing');trapBoss.dead=true;updateBossFields(.01);if(bossFields.length)throw Error('Dead boss left active hazards');
+console.log('PASS: five hits per second, per-mob doubling and one-second reset, six boss patterns, warnings, slows and hazard cleanup');
 save();console.log('PASS: combat, drawing, six boss transitions, inventory, XP, research rendering, rebirth and saving');
 `,box);
+
 
 
 
