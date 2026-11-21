@@ -73,7 +73,7 @@ s.waveTrait='armored';spawn(true);const bossHealth=enemies[2].hp;s.waveTrait=nul
 s.waveTrait='horde';s.waveKills=quota()-1;die({boss:false,kind:0,tier:0,x:0,y:0});if(s.wave!==4||!waveTrait().name||s.waveTrait==='horde')throw Error('Wave did not get a new modifier');Math.random=savedRandom;
 clearArena();s.waveTrait='horde';update(.001);if(enemies.length!==3)throw Error('Horde must spawn three mobs');while(enemies.length<47)spawn(false,0);spawnClock=0;update(.001);if(enemies.length!==48)throw Error('Horde must respect its cap');
 console.log('PASS: wave modifiers change horde quota and elite stats, leave bosses alone, and rotate on wave clear');
-s.loadout=[{t:0,r:0}];clearArena();hp=100;keys={};elapsed=0;const mobA={},mobB={};hurt(10,mobA);hurt(10,mobA);hurt(10,mobB);if(hp!==80)throw Error('Different mobs must hit independently');elapsed=.999;hurt(10,mobA);if(hp!==80)throw Error('Same mob hit before one second');elapsed=1;hurt(10,mobA);if(hp!==70)throw Error('Same mob cannot hit after one second');
+s.loadout=[{t:0,r:0}];clearArena();hp=100;keys={};elapsed=0;const mobA={},mobB={};hurt(10,mobA);hurt(10,mobA);hurt(10,mobB);if(hp!==80)throw Error('Different mobs must hit independently');elapsed=.499;hurt(10,mobA);if(hp!==80)throw Error('Same mob hit before half a second');elapsed=.5;hurt(10,mobA);if(hp!==70)throw Error('Same mob cannot hit after half a second');
 s.loadout=[{t:0,r:0}];clearArena();angle=0;spawnClock=100;
 enemies=[{x:player.x+57,y:player.y,r:15,hp:1e5,max:1e5,speed:0,kind:0,t:0,hit:0,slow:0}];
 const beforePetalPush=enemies[0].x;update(.01);if(enemies[0].x<=beforePetalPush)throw Error('Ordinary petals must knock enemies back');
@@ -124,16 +124,17 @@ enemies=[{x:heavyBeetle.x+20,y:heavyBeetle.y,r:12,hp:1000,max:1000,speed:0,kind:
 console.log('PASS: Cactus health and rarity scaling, Rose consumption without losing inventory, four-second reloads, and heavy Broodbud shove');
 s.level=1;s.garden=1;s.wave=1;s.waveTrait=null;s.research=fresh().research;s.loadout=[{t:0,r:0}];
 function contactDamageAt(distance){clearArena();spawnClock=100;hp=maxHP();const e={x:player.x+distance,y:player.y,r:12,hp:1e8,max:1e8,speed:0,kind:0,t:0,hit:0,slow:0};enemies=[e];update(.001);return hp<maxHP();}
-if(!contactDamageAt(29.5)||contactDamageAt(30.5))throw Error('Mob contact range must be exactly one pixel larger');
+if(!contactDamageAt(28.5)||contactDamageAt(29.5))throw Error('Mob contact range must match the original size');
 s.loadout=[{t:12,r:0}];clearArena();spawnClock=100;updateAbilities(.001,57);
 const solidBeetle=summons[0];enemies=[{x:player.x+120,y:player.y,r:20,hp:1e9,max:1e9,speed:35,kind:0,t:0,hit:0,slow:0}];
 for(let j=0;j<100;j++){update(.02);if(Math.hypot(solidBeetle.x-enemies[0].x,solidBeetle.y-enemies[0].y)<solidBeetle.r+enemies[0].r-.001)throw Error('Summon phases during combat');}
 if(enemies[0].hp>=1e9)throw Error('Solid summon no longer attacks');
 enemies[0].x=solidBeetle.x;enemies[0].y=solidBeetle.y;resolveSummonCollisions();if(Math.hypot(solidBeetle.x-enemies[0].x,solidBeetle.y-enemies[0].y)<solidBeetle.r+enemies[0].r)throw Error('Exact-center overlap not resolved');
 solidBeetle.x=18;solidBeetle.y=200;enemies[0].x=38;enemies[0].y=200;enemies[0].r=38;enemies[0].boss=true;resolveSummonCollisions();if(Math.hypot(solidBeetle.x-enemies[0].x,solidBeetle.y-enemies[0].y)<56)throw Error('Wall collision phases into boss');
-console.log('PASS: one-pixel contact-range extension and solid summon collision during pursuit, overlap and wall contact');
+console.log('PASS: original contact range and solid summon collision during pursuit, overlap and wall contact');
 save();console.log('PASS: combat, drawing, six boss transitions, inventory, XP, research rendering, rebirth and saving');
 `,box);
+
 
 
 
