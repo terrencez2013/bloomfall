@@ -150,8 +150,15 @@ clearArena();s.garden=1;hp=maxHP();spawn(true);const trapBoss=enemies[0];bossFie
 console.log('PASS: five hits per second, per-mob additive damage and one-second reset, six boss patterns, warnings, slows and hazard cleanup');
 let soundStarts=0;
 const audioParam=()=>({value:0,setValueAtTime:()=>{},exponentialRampToValueAtTime:()=>{}});
-window.AudioContext=class{constructor(){this.state='running';this.currentTime=0;this.destination={};}createGain(){return{gain:audioParam(),connect:()=>{},disconnect:()=>{}};}createDynamicsCompressor(){return{threshold:audioParam(),ratio:audioParam(),connect:()=>{}};}createOscillator(){return{frequency:audioParam(),connect:()=>{},disconnect:()=>{},start:()=>soundStarts++,stop:()=>{}};}};
-unlockGameAudio();soundMuted=false;gameAudio.currentTime=1;playHitSound('petal');playHitSound('player');if(soundStarts!==2)throw Error('Missing hit sounds');toggleGameSound();gameAudio.currentTime=2;playHitSound('petal');if(soundStarts!==2)throw Error('Muted audio played');toggleGameSound();playHitSound('petal');if(soundStarts!==3)throw Error('Unmuted audio did not resume');
+window.AudioContext=class{
+constructor(){this.state='running';this.currentTime=0;this.sampleRate=24000;this.destination={};}
+createGain(){return{gain:audioParam(),connect:()=>{},disconnect:()=>{}};}
+createDynamicsCompressor(){return{threshold:audioParam(),ratio:audioParam(),connect:()=>{}};}
+createBuffer(channels,length){const data=new Float32Array(length);return{length,getChannelData:()=>data};}
+createBiquadFilter(){return{frequency:audioParam(),Q:audioParam(),connect:()=>{},disconnect:()=>{}};}
+createBufferSource(){return{playbackRate:audioParam(),connect:()=>{},disconnect:()=>{},start:()=>soundStarts++,stop:()=>{}};}
+};
+unlockGameAudio();soundMuted=false;gameAudio.currentTime=1;playHitSound('petal');playHitSound('player');if(soundStarts!==2)throw Error('Missing hit sounds');toggleGameSound();gameAudio.currentTime=2;playHitSound('petal');if(soundStarts!==2)throw Error('Muted audio played');toggleGameSound();playHitSound('petal');if(soundStarts!==3)throw Error('Unmuted audio did not resume');if(gameAudioBus.gain.value!==.055)throw Error('Audio volume not reduced');for(const kind of ['petal','player']){const data=mulchBuffers[kind].getChannelData(0);if(!data.some(n=>Math.abs(n)>.01)||data.some(n=>!Number.isFinite(n)||Math.abs(n)>1))throw Error('Invalid mulch crunch buffer');}
 const soundCalls={petal:0,player:0},soundFunction=playHitSound;playHitSound=kind=>soundCalls[kind]++;
 s.garden=1;s.wave=1;s.waveTrait=null;s.loadout=[{t:0,r:0}];s.research=fresh().research;s.level=1;clearArena();spawnClock=100;hp=maxHP();
 enemies=Array.from({length:2},()=>({x:player.x+28.99,y:player.y,r:12,hp:1e8,max:1e8,speed:0,kind:0,t:0,hit:0,slow:0}));
@@ -169,6 +176,7 @@ enemies=[rush];resolvePlayerCollisions();if(Math.hypot(player.x-rush.x,player.y-
 console.log('PASS: solid player/enemy bodies, wall separation, and fast-dash tunneling prevention');
 save();console.log('PASS: combat, drawing, six boss transitions, inventory, XP, research rendering, rebirth and saving');
 `,box);
+
 
 
 
