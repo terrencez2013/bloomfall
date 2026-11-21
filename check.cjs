@@ -104,8 +104,18 @@ s.inventory=[{t:0,r:0,n:5}];if(canMerge(item(0,0)))throw Error('Equipped copies 
 s.garden=30;s.inventory=[];rollMobLoot({boss:true,kind:0});if(s.inventory.some(p=>p.r!==12))throw Error('Late-game loot does not reach new rarity cap');
 for(let kind=0;kind<4;kind++)drawMob({x:w/2,y:h/2,r:20,kind,boss:false,t:1,hit:0,tier:0});
 console.log('PASS: thirteen rarities, five new crafting tiers, maximum-tier handling, glow eligibility, late-game drops and enhanced bug rendering');
+s.garden=1;s.wave=1;s.loadout=[{t:0,r:0}];clearArena();spawnClock=100;spawn(true);
+const dashBoss=enemies[0];dashBoss.x=player.x-300;dashBoss.y=player.y;dashBoss.cool=0;
+update(.01);if(dashBoss.charge||dashBoss.dashWindup)throw Error('Boss dashed outside its radius');
+dashBoss.x=player.x-170;dashBoss.cool=0;update(.01);
+if(dashBoss.dashWindup!==.5||dashBoss.charge)throw Error('Boss must telegraph before dashing');
+const windupX=dashBoss.x;update(.24);update(.25);if(dashBoss.charge||dashBoss.x!==windupX)throw Error('Boss moved before half second');
+player.y+=70;update(.01);if(dashBoss.charge!==.75||dashBoss.vy!==0)throw Error('Boss must launch after half second in telegraphed direction');update(.02);if(dashBoss.x<=windupX)throw Error('Boss never launched');
+draw();
+console.log('PASS: boss dash radius, half-second stationary windup, and locked warning direction');
 save();console.log('PASS: combat, drawing, six boss transitions, inventory, XP, research rendering, rebirth and saving');
 `,box);
+
 
 
 

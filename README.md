@@ -63,3 +63,4 @@ Each enemy can hurt the player once per second, independently of other enemies. 
 
 Inventory refresh: petals have large illustrated symbols, bold names, and rarity-colored cards and equipped slots. Five available unequipped copies glow and show Ready to merge. Crafting stacks also glow when ready. Added Celestial, Astral, Cosmic, Eternal, and Singularity above Transcendent, with crafting and late-garden loot supporting all thirteen rarities. Bugs now have richer shell colors, wing veins, facial details, and highlights.
 
+Charging bosses only start a dash within 240 pixels of the flower. They stop for half a second and show a warning line before launching toward the position they targeted, giving the player time to dodge.
