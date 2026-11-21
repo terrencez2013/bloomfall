@@ -29,3 +29,9 @@ header{background:#f6fae9;border-bottom-color:#c8dcad}
 .inventory-slot.selected{border-color:var(--rarity);outline:2px solid #466d47;outline-offset:2px}
 .craft-stack span{font-size:39px;line-height:1.2}.craft-stack b{font-size:12px;font-weight:800}.craft-stack{padding:14px 5px}
 @media(max-width:600px){.petal-art{width:92px;height:92px}.petal-art>span{font-size:57px}.petal-card h3{font-size:21px}}
+.petal-card.merge-ready,.craft-stack.merge-ready{border-color:#ffd95e;box-shadow:0 0 0 3px #fff2a8,0 0 20px 7px color-mix(in srgb,var(--rarity) 70%,#ffe67d),0 0 45px 10px color-mix(in srgb,var(--rarity) 55%,transparent)}
+.petal-card.merge-ready .petal-art{box-shadow:0 0 0 2px #fff2bc,0 0 24px 8px color-mix(in srgb,var(--rarity) 70%,#fff0a2),inset 0 0 24px #fff}
+.petal-card.merge-ready::after{content:'✦';position:absolute;right:16px;top:16px;font-size:29px;color:#ffd34a;text-shadow:0 0 6px #fff,0 0 15px #ffc747}
+.merge-ready .merge-badge{background:#ffdf61;border-color:#d0a92d;color:#544117;box-shadow:0 0 14px #ffdc6b99}
+#collection,#inventory-items{gap:25px;padding:9px}
+#craft-stacks{padding:10px;gap:15px}

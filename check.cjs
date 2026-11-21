@@ -13,9 +13,9 @@ tab='research';render();$('rebirth').onclick();if(s.garden!==1||s.rebirth!==1||s
 s.inventory=fresh().inventory;s.loadout=fresh().loadout;addPetal(1,0);addPetal(1,0);clearArena();hp=maxHP();running=true;
 toggleInventory(true);const before=elapsed;frame(1000);if(elapsed!==before)throw Error('Inventory must pause combat');toggleInventory(false);
 const click=dataset=>handler({target:{closest:()=>({dataset})}});
-equipSlot=0;click({equip:'1,0'});if(s.loadout[0].t!==1||petalLife(0).cool!==8)throw Error('Equip cooldown');
+equipSlot=0;click({equip:'1,0'});if(s.loadout[0].t!==1||petalLife(0).cool!==4)throw Error('Equip cooldown');
 click({equip:'1,0'});click({equip:'1,0'});const owned=s.loadout.filter(p=>p.t===1&&p.r===0).length;click({equip:'1,0'});if(s.loadout.filter(p=>p.t===1&&p.r===0).length!==owned)throw Error('Over-equipping');
-clearArena();damagePetal(0,1e6);if(petalLife(0).hp!==0||petalLife(0).cool!==8)throw Error('Petal break');
+clearArena();damagePetal(0,1e6);if(petalLife(0).hp!==0||petalLife(0).cool!==4)throw Error('Petal break');
 spawnClock=100;for(let i=0;i<450;i++)update(.02);if(petalLife(0).cool!==0||petalLife(0).hp!==petalHP(s.loadout[0]))throw Error('Petal regrowth');
 for(let i=0;i<10;i++)addPetal(2,0);click({fuse:'2,0'});craftBatch(true);if(!item(2,1)||item(2,0).n!==0)throw Error('Fusion');
 clearArena();angle=0;shots=[{x:player.x+57,y:player.y,vx:0,vy:0,life:5,r:5}];const healthBefore=petalLife(0).hp;update(.001);if(shots.length!==0||petalLife(0).hp>=healthBefore)throw Error('Petal projectile interception');
@@ -49,7 +49,7 @@ s.loadout=[{t:18,r:0}];clearArena();if(Math.abs(orbitSpeed()-1.35)>.001)throw Er
 console.log('PASS: Starburst wave hits, kills, rewards, recasts, elite/champion stats and attacks, loot rarity floors, late-boss loot, Whirligig and 20-petal rendering');
 console.log('PASS: gallery kill tracking, matching loot tables, every petal obtainable, boss rewards, healing, progression, Aegis, Lodestone, Ember, Bloodroot and Starburst');
 console.log('PASS: protected batch crafting, permanent slot milestones, 20-slot cap, poison, lightning chains, summons, speed passive and knockback');
-s.bestLevel=1;s.level=1;s.research.slots=0;s.inventory=[{t:1,r:0,n:2},{t:1,r:1,n:1},{t:0,r:0,n:2}];s.loadout=[{t:1,r:1},{t:1,r:0},{t:1,r:0},{t:0,r:0},{t:0,r:0}];clearArena();running=true;addPetal(1,2);if(s.loadout[1].r!==2||s.loadout.filter(p=>p.t===1&&p.r===2).length!==1)throw Error('Auto upgrade weakest slot');if(petalLife(1).cool!==RELOAD||item(1,0).n!==2)throw Error('Auto equip regrowth or retained inventory');addPetal(1,2,2);if(s.loadout.filter(p=>p.t===1&&p.r===2).length!==3)throw Error('Batch auto upgrade');const layout=JSON.stringify(s.loadout);addPetal(1,0);addPetal(2,3);if(JSON.stringify(s.loadout)!==layout)throw Error('Auto downgrade or unrelated replacement');
+s.bestLevel=1;s.level=1;s.research.slots=0;s.inventory=[{t:1,r:0,n:2},{t:1,r:1,n:1},{t:0,r:0,n:2}];s.loadout=[{t:1,r:1},{t:1,r:0},{t:1,r:0},{t:0,r:0},{t:0,r:0}];clearArena();running=true;addPetal(1,2);if(s.loadout[1].r!==2||s.loadout.filter(p=>p.t===1&&p.r===2).length!==1)throw Error('Auto upgrade weakest slot');if(petalLife(1).cool!==4||item(1,0).n!==2)throw Error('Auto equip regrowth or retained inventory');addPetal(1,2,2);if(s.loadout.filter(p=>p.t===1&&p.r===2).length!==3)throw Error('Batch auto upgrade');const layout=JSON.stringify(s.loadout);addPetal(1,0);addPetal(2,3);if(JSON.stringify(s.loadout)!==layout)throw Error('Auto downgrade or unrelated replacement');
 for(let garden=1;garden<=30;garden++){const profile=lootProfile({boss:true},garden);if(profile.chance!==1||profile.bonus!==.35||profile.rolls!==3+Math.min(3,Math.floor((garden-1)/3))||profile.floor!==Math.min(MAX_RARITY,Math.floor((garden-1)/2)+2))throw Error('Boss drop profile changed');}if(lootProfile({tier:1},1).chance!==.8||lootProfile({tier:1},1).bonus!==.18||lootProfile({tier:2},1).bonus!==.25)throw Error('Elite adjustment');
 s.garden=1;s.wave=1;s.waveKills=0;s.research.fortune=0;s.seeds=0;clearArena();die({boss:false,kind:0,tier:0,x:0,y:0});if(Math.abs(drops[0].xp-12*1.32)>.0001||drops[0].n!==12)throw Error('Reduced mob XP without nectar change');
 s.bestLevel=100;s.research.slots=100;s.inventory=[{t:0,r:0,n:48}];s.loadout=Array.from({length:48},()=>({t:0,r:0}));petalState=Array.from({length:48},()=>({hp:1,cool:0}));equipSlot=47;syncSlots();if(s.loadout.length!==20||petalState.length!==20||equipSlot!==19||item(0,0).n!==48||available(item(0,0))!==28)throw Error('Old save cap migration loses petals');render();if(!$('slot-progress').textContent.includes('All 20'))throw Error('Slot cap display');const slotResearch=s.research.slots;click({upgrade:'slots'});if(s.research.slots!==slotResearch)throw Error('Research exceeds cap');
@@ -113,8 +113,19 @@ const windupX=dashBoss.x;update(.24);update(.25);if(dashBoss.charge||dashBoss.x!
 player.y+=70;update(.01);if(dashBoss.charge!==.75||dashBoss.vy!==0)throw Error('Boss must launch after half second in telegraphed direction');update(.02);if(dashBoss.x<=windupX)throw Error('Boss never launched');
 draw();
 console.log('PASS: boss dash radius, half-second stationary windup, and locked warning direction');
+s.level=1;s.rebirth=0;s.bestLevel=1;s.research=fresh().research;s.loadout=fresh().loadout;clearArena();
+const baseMax=maxHP();s.loadout[0]={t:2,r:0};if(maxHP()!==baseMax+35)throw Error('Cactus max health bonus');s.loadout[0]={t:2,r:1};if(maxHP()!==baseMax+70)throw Error('Cactus rarity scaling');hp=maxHP();s.loadout[0]={t:0,r:0};render();if(hp!==baseMax)throw Error('Health must clamp after unequipping Cactus');
+s.inventory=fresh().inventory;s.loadout[0]={t:1,r:0};clearArena();hp=maxHP();if(consumeRose(0))throw Error('Rose consumed at full health');hp=maxHP()*.7;const roseCopies=item(1,0).n;
+if(!consumeRose(0)||hp!==maxHP()||petalLife(0).cool!==4||petalLife(0).hp!==0||item(1,0).n!==roseCopies)throw Error('Rose heal/regrowth cycle');
+if(consumeRose(0))throw Error('Rose consumed during reload');
+s.loadout[0]={t:16,r:0};clearArena();damagePetal(0,1e6);if(petalLife(0).cool!==4||petalReload({t:0,r:0})!==8)throw Error('Bloodroot reload must be halved without changing others');
+s.loadout=[{t:12,r:0}];clearArena();updateAbilities(.01,57);const heavyBeetle=summons[0];if(heavyBeetle.r!==18||heavyBeetle.mass!==6||heavyBeetle.hp!==72)throw Error('Broodbud heavy summon stats');
+enemies=[{x:heavyBeetle.x+20,y:heavyBeetle.y,r:12,hp:1000,max:1000,speed:0,kind:0,t:0,hit:0,slow:0}];const beforeShove=enemies[0].x;updateAbilities(.01,57);if(enemies[0].x<=beforeShove)throw Error('Summon mass does not shove mobs');draw();
+console.log('PASS: Cactus health and rarity scaling, Rose consumption without losing inventory, four-second reloads, and heavy Broodbud shove');
 save();console.log('PASS: combat, drawing, six boss transitions, inventory, XP, research rendering, rebirth and saving');
 `,box);
+
+
 
 
 
