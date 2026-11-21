@@ -12,7 +12,7 @@ Open `dist/index.html` in a browser, or run `node serve.cjs` and visit http://12
 
 Choose a slot under Orbit loadout, then equip a petal from Petal collection. Press C for Crafting. Select a stack, then combine five **unequipped** matching petals for a guaranteed higher rarity. Craft all processes every available batch. Research uses nectar. Rebirth unlocks at garden 4, keeping petals and research and granting permanent power and seed bonuses. Seeds passively increase nectar and XP rewards by 0.5% each. Progress is saved in this browser every five seconds.
 
-Features nineteen petal types, eight rarities, six repeating boss patterns, twelve cycling garden themes, unlimited scaling gardens, twenty unlockable orbit slots, permanent research, and rebirths.
+Features nineteen petal types, thirteen rarities, six repeating boss patterns, twelve cycling garden themes, unlimited scaling gardens, twenty unlockable orbit slots, permanent research, and rebirths.
 
 Run `node check.cjs` for a headless simulation check. Browser playtesting and long-term balance tuning are still recommended.
 
@@ -60,3 +60,6 @@ Starburst now has 25 base HP and retains its 20% on-hit explosion chance. The ar
 Horde waves spawn three mobs per batch, up to 48 active enemies. Bosses have about 38% more health, deal 30% more damage, and use special attacks more often.
 Bosses now have four times their previous health. Their arrival, special attacks, and defeat trigger bursts of sparks and arena shake. Effects intensify in later gardens and as bosses lose health. Reduced-motion mode disables shake and limits sparks.
 Each enemy can hurt the player once per second, independently of other enemies. Contact and projectiles share the same timer for their source enemy. Starburst now has 12.5 base HP and a 30% explosion chance on hit.
+
+Inventory refresh: petals have large illustrated symbols, bold names, and rarity-colored cards and equipped slots. Five available unequipped copies glow and show Ready to merge. Crafting stacks also glow when ready. Added Celestial, Astral, Cosmic, Eternal, and Singularity above Transcendent, with crafting and late-garden loot supporting all thirteen rarities. Bugs now have richer shell colors, wing veins, facial details, and highlights.
+

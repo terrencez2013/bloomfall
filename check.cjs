@@ -50,7 +50,7 @@ console.log('PASS: Starburst wave hits, kills, rewards, recasts, elite/champion 
 console.log('PASS: gallery kill tracking, matching loot tables, every petal obtainable, boss rewards, healing, progression, Aegis, Lodestone, Ember, Bloodroot and Starburst');
 console.log('PASS: protected batch crafting, permanent slot milestones, 20-slot cap, poison, lightning chains, summons, speed passive and knockback');
 s.bestLevel=1;s.level=1;s.research.slots=0;s.inventory=[{t:1,r:0,n:2},{t:1,r:1,n:1},{t:0,r:0,n:2}];s.loadout=[{t:1,r:1},{t:1,r:0},{t:1,r:0},{t:0,r:0},{t:0,r:0}];clearArena();running=true;addPetal(1,2);if(s.loadout[1].r!==2||s.loadout.filter(p=>p.t===1&&p.r===2).length!==1)throw Error('Auto upgrade weakest slot');if(petalLife(1).cool!==RELOAD||item(1,0).n!==2)throw Error('Auto equip regrowth or retained inventory');addPetal(1,2,2);if(s.loadout.filter(p=>p.t===1&&p.r===2).length!==3)throw Error('Batch auto upgrade');const layout=JSON.stringify(s.loadout);addPetal(1,0);addPetal(2,3);if(JSON.stringify(s.loadout)!==layout)throw Error('Auto downgrade or unrelated replacement');
-for(let garden=1;garden<=30;garden++){const profile=lootProfile({boss:true},garden);if(profile.chance!==1||profile.bonus!==.35||profile.rolls!==3+Math.min(3,Math.floor((garden-1)/3))||profile.floor!==Math.min(7,Math.floor((garden-1)/2)+2))throw Error('Boss drop profile changed');}if(lootProfile({tier:1},1).chance!==.8||lootProfile({tier:1},1).bonus!==.18||lootProfile({tier:2},1).bonus!==.25)throw Error('Elite adjustment');
+for(let garden=1;garden<=30;garden++){const profile=lootProfile({boss:true},garden);if(profile.chance!==1||profile.bonus!==.35||profile.rolls!==3+Math.min(3,Math.floor((garden-1)/3))||profile.floor!==Math.min(MAX_RARITY,Math.floor((garden-1)/2)+2))throw Error('Boss drop profile changed');}if(lootProfile({tier:1},1).chance!==.8||lootProfile({tier:1},1).bonus!==.18||lootProfile({tier:2},1).bonus!==.25)throw Error('Elite adjustment');
 s.garden=1;s.wave=1;s.waveKills=0;s.research.fortune=0;s.seeds=0;clearArena();die({boss:false,kind:0,tier:0,x:0,y:0});if(Math.abs(drops[0].xp-12*1.32)>.0001||drops[0].n!==12)throw Error('Reduced mob XP without nectar change');
 s.bestLevel=100;s.research.slots=100;s.inventory=[{t:0,r:0,n:48}];s.loadout=Array.from({length:48},()=>({t:0,r:0}));petalState=Array.from({length:48},()=>({hp:1,cool:0}));equipSlot=47;syncSlots();if(s.loadout.length!==20||petalState.length!==20||equipSlot!==19||item(0,0).n!==48||available(item(0,0))!==28)throw Error('Old save cap migration loses petals');render();if(!$('slot-progress').textContent.includes('All 20'))throw Error('Slot cap display');const slotResearch=s.research.slots;click({upgrade:'slots'});if(s.research.slots!==slotResearch)throw Error('Research exceeds cap');
 console.log('PASS: 20-slot migration preserves all owned petals and disables further slot research');
@@ -88,8 +88,25 @@ for(const [ox,oy] of [[6,0],[-6,0],[0,6],[0,-6]]){
   if(ox&&(mob.x-beforeX)*ox<=0||oy&&(mob.y-beforeY)*oy<=0)throw Error('Petal knockback must follow contact direction');
 }
 console.log('PASS: petal contact knocks mobs away from hits on all four sides');
+if(RARITIES.length!==13||RC.length!==13||MAX_RARITY!==12)throw Error('Expected thirteen complete rarity definitions');
+s.bestLevel=1;s.research.slots=0;s.loadout=fresh().loadout;petalState=[];
+for(let r=7;r<MAX_RARITY;r++){
+  s.inventory=[{t:2,r,n:5}];recipe=[2,r];
+  if(!canMerge(item(2,r)))throw Error('High rarity merge incorrectly blocked');
+  renderCollection();renderCrafting();
+  if(!$('collection').innerHTML.includes('merge-ready')||!$('collection').innerHTML.includes('petal-art')||!$('collection').innerHTML.includes(RARITIES[r]))throw Error('Colored merge-ready card missing');
+  craftBatch(false);
+  if(!item(2,r+1)||item(2,r+1).n!==1||item(2,r).n!==0)throw Error('New rarity crafting failed');
+}
+s.inventory=[{t:2,r:12,n:5}];recipe=[2,12];renderCollection();renderCrafting();craftBatch(true);
+if(canMerge(item(2,12))||!$('craft-one').disabled||item(2,12).n!==5||$('collection').innerHTML.includes('undefined'))throw Error('Maximum rarity not handled');
+s.inventory=[{t:0,r:0,n:5}];if(canMerge(item(0,0)))throw Error('Equipped copies must not enable glow');
+s.garden=30;s.inventory=[];rollMobLoot({boss:true,kind:0});if(s.inventory.some(p=>p.r!==12))throw Error('Late-game loot does not reach new rarity cap');
+for(let kind=0;kind<4;kind++)drawMob({x:w/2,y:h/2,r:20,kind,boss:false,t:1,hit:0,tier:0});
+console.log('PASS: thirteen rarities, five new crafting tiers, maximum-tier handling, glow eligibility, late-game drops and enhanced bug rendering');
 save();console.log('PASS: combat, drawing, six boss transitions, inventory, XP, research rendering, rebirth and saving');
 `,box);
+
 
 
 
