@@ -134,7 +134,7 @@ solidBeetle.x=18;solidBeetle.y=200;enemies[0].x=38;enemies[0].y=200;enemies[0].r
 console.log('PASS: original contact range and solid summon collision during pursuit, overlap and wall contact');
 s.loadout=[{t:0,r:0}];keys={};clearArena();hp=10000;elapsed=0;const comboA={},comboB={};const dealt=[];
 for(let i=0;i<5;i++){elapsed=i*.2;const before=hp;hurt(10,comboA);dealt.push(before-hp);hurt(10,comboA);if(hp!==before-dealt[i])throw Error('Enemy exceeded five hits per second');}
-if(dealt.join(',')!=='10,20,40,80,160')throw Error('Per-enemy doubling incorrect');
+if(dealt.join(',')!=='10,20,30,40,50')throw Error('Per-enemy additive damage ramp incorrect');
 const beforeOther=hp;hurt(10,comboB);if(beforeOther-hp!==10)throw Error('Different mob shared combo');
 elapsed=1;const resetBefore=hp;hurt(10,comboA);if(resetBefore-hp!==10)throw Error('Damage combo did not reset after one second');
 s.level=1;s.garden=1;s.wave=1;s.research=fresh().research;
@@ -147,7 +147,7 @@ if(k===4&&!bossFields.some(f=>f.type==='web'))throw Error('Weaver traps');
 if(k===5){bossSpecial(b,170,0,170);bossSpecial(b,170,0,170);if(!bossFields.some(f=>f.type==='thorns')||!bossFields.some(f=>f.type==='stomp'))throw Error('Eternal phases');}
 draw();}
 clearArena();s.garden=1;hp=maxHP();spawn(true);const trapBoss=enemies[0];bossField(trapBoss,'thorns',player.x,player.y,40,.5,2);const safeHP=hp;updateBossFields(.2);if(hp!==safeHP)throw Error('Telegraph dealt damage');updateBossFields(.31);updateBossFields(.01);if(hp>=safeHP)throw Error('Active thorn trap did not hit');bossField(trapBoss,'web',player.x,player.y,40,0,2);if(bossTerrainSpeed()!==.55)throw Error('Web slow missing');trapBoss.dead=true;updateBossFields(.01);if(bossFields.length)throw Error('Dead boss left active hazards');
-console.log('PASS: five hits per second, per-mob doubling and one-second reset, six boss patterns, warnings, slows and hazard cleanup');
+console.log('PASS: five hits per second, per-mob additive damage and one-second reset, six boss patterns, warnings, slows and hazard cleanup');
 let soundStarts=0;
 const audioParam=()=>({value:0,setValueAtTime:()=>{},exponentialRampToValueAtTime:()=>{}});
 window.AudioContext=class{constructor(){this.state='running';this.currentTime=0;this.destination={};}createGain(){return{gain:audioParam(),connect:()=>{},disconnect:()=>{}};}createDynamicsCompressor(){return{threshold:audioParam(),ratio:audioParam(),connect:()=>{}};}createOscillator(){return{frequency:audioParam(),connect:()=>{},disconnect:()=>{},start:()=>soundStarts++,stop:()=>{}};}};
@@ -158,8 +158,19 @@ enemies=Array.from({length:2},()=>({x:player.x+28.99,y:player.y,r:12,hp:1e8,max:
 update(.001);if(enemies.some(e=>e.comboHits!==1)||soundCalls.player!==2)throw Error('Simultaneous contacts did not both register');const hpAfterDoubleHit=hp;update(.001);if(hp<hpAfterDoubleHit)throw Error('Per-enemy hit cooldown changed');
 clearArena();spawnClock=100;angle=-.001*1.8;enemies=[{x:player.x+57,y:player.y,r:12,hp:1e8,max:1e8,speed:0,kind:0,t:0,hit:0,slow:0}];update(.001);if(!soundCalls.petal)throw Error('Petal collision did not trigger sound');playHitSound=soundFunction;
 console.log('PASS: distinct hit sounds, mute control, petal collision audio, and simultaneous mob damage without changing per-mob combos');
+s.loadout=[{t:0,r:0}];clearArena();
+for(const [x,y] of [[w/2,h/2],[25,200],[w-25,200],[200,70],[200,h-50]]){
+  player.x=x;player.y=y;enemies=[{x:x+6,y:y+2,r:38,hp:1e6,boss:true}];resolvePlayerCollisions();
+  if(Math.hypot(player.x-enemies[0].x,player.y-enemies[0].y)<55-.001)throw Error('Mob body overlaps flower');
+  if(player.x<25||player.x>w-25||player.y<70||player.y>h-50)throw Error('Collision pushed flower outside arena');
+}
+clearArena();const rush={x:player.x+200,y:player.y,r:38,hp:1e6,boss:true};stopMobTunnel(rush,player.x-200,player.y,player.x,player.y);if(rush.x>player.x-55+.001)throw Error('Fast dash tunneled through flower');
+enemies=[rush];resolvePlayerCollisions();if(Math.hypot(player.x-rush.x,player.y-rush.y)<55)throw Error('Dash contact separation');
+console.log('PASS: solid player/enemy bodies, wall separation, and fast-dash tunneling prevention');
 save();console.log('PASS: combat, drawing, six boss transitions, inventory, XP, research rendering, rebirth and saving');
 `,box);
+
+
 
 
 
