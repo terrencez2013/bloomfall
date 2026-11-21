@@ -80,8 +80,17 @@ const beforePetalPush=enemies[0].x;update(.01);if(enemies[0].x<=beforePetalPush)
 function measureMobPush(r){clearArena();spawnClock=100;hp=100;enemies=[{x:player.x-16,y:player.y,r,hp:1e5,max:1e5,speed:0,kind:0,t:0,hit:0,slow:0,nextPlayerHit:elapsed+1}];const before=player.x;update(.01);return player.x-before;}
 const smallPush=measureMobPush(13),largePush=measureMobPush(38);
 if(smallPush<=0||largePush<=smallPush||hp<100)throw Error('Enemy shove must scale with size, independently of hit cooldown');
+s.research.speed=0;s.loadout=[{t:0,r:0}];
+for(const [ox,oy] of [[6,0],[-6,0],[0,6],[0,-6]]){
+  clearArena();spawnClock=100;angle=-.001*1.8;
+  const mob={x:player.x+57+ox,y:player.y+oy,r:12,hp:1e5,max:1e5,speed:0,kind:0,t:0,hit:0,slow:0};
+  enemies=[mob];const beforeX=mob.x,beforeY=mob.y;update(.001);
+  if(ox&&(mob.x-beforeX)*ox<=0||oy&&(mob.y-beforeY)*oy<=0)throw Error('Petal knockback must follow contact direction');
+}
+console.log('PASS: petal contact knocks mobs away from hits on all four sides');
 save();console.log('PASS: combat, drawing, six boss transitions, inventory, XP, research rendering, rebirth and saving');
 `,box);
+
 
 
 
