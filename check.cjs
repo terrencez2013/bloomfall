@@ -2,7 +2,7 @@ const vm=require('node:vm'),fs=require('node:fs'),assert=require('node:assert/st
 const elements=new Map();let handler;
 const noop=()=>{};const ctx=new Proxy({},{get:(_,key)=>key==="createRadialGradient"?()=>({addColorStop:noop}):noop,set:()=>true});
 function el(id){if(!elements.has(id))elements.set(id,{style:{},setAttribute:noop,focus:noop,classList:{add:noop,remove:noop,toggle:noop},getBoundingClientRect:()=>({width:900,height:590}),getContext:()=>ctx,addEventListener:noop,querySelector:()=>el(id+'child')});return elements.get(id);}
-const box={console,Math,JSON,devicePixelRatio:1,document:{getElementById:el,querySelectorAll:()=>[],addEventListener:(type,fn)=>handler=fn},window:{addEventListener:noop},localStorage:{getItem:()=>null,setItem:noop},ResizeObserver:class{observe(){}},requestAnimationFrame:noop,setInterval:noop,setTimeout:noop,clearTimeout:noop};vm.createContext(box);vm.runInContext(fs.readFileSync('dist/gallery.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/abilities.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/mobs.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/bosses.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/game.js','utf8'),box);
+const box={console,Math,JSON,devicePixelRatio:1,document:{getElementById:el,querySelectorAll:()=>[],addEventListener:(type,fn)=>handler=fn},window:{addEventListener:noop},localStorage:{getItem:()=>null,setItem:noop},ResizeObserver:class{observe(){}},requestAnimationFrame:noop,setInterval:noop,setTimeout:noop,clearTimeout:noop};vm.createContext(box);vm.runInContext(fs.readFileSync('dist/gallery.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/abilities.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/mobs.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/bosses.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/audio.js','utf8'),box);vm.runInContext(fs.readFileSync('dist/game.js','utf8'),box);
 box.handler=handler;vm.runInContext(`
 const chooseWaveTrait=rollWaveTrait;rollWaveTrait=()=>{s.waveTrait=null;};begin();for(let i=0;i<600;i++)update(1/60);draw();
 if(!Number.isFinite(hp)||enemies.length===0)throw Error('Combat simulation failed');
@@ -148,8 +148,19 @@ if(k===5){bossSpecial(b,170,0,170);bossSpecial(b,170,0,170);if(!bossFields.some(
 draw();}
 clearArena();s.garden=1;hp=maxHP();spawn(true);const trapBoss=enemies[0];bossField(trapBoss,'thorns',player.x,player.y,40,.5,2);const safeHP=hp;updateBossFields(.2);if(hp!==safeHP)throw Error('Telegraph dealt damage');updateBossFields(.31);updateBossFields(.01);if(hp>=safeHP)throw Error('Active thorn trap did not hit');bossField(trapBoss,'web',player.x,player.y,40,0,2);if(bossTerrainSpeed()!==.55)throw Error('Web slow missing');trapBoss.dead=true;updateBossFields(.01);if(bossFields.length)throw Error('Dead boss left active hazards');
 console.log('PASS: five hits per second, per-mob doubling and one-second reset, six boss patterns, warnings, slows and hazard cleanup');
+let soundStarts=0;
+const audioParam=()=>({value:0,setValueAtTime:()=>{},exponentialRampToValueAtTime:()=>{}});
+window.AudioContext=class{constructor(){this.state='running';this.currentTime=0;this.destination={};}createGain(){return{gain:audioParam(),connect:()=>{},disconnect:()=>{}};}createDynamicsCompressor(){return{threshold:audioParam(),ratio:audioParam(),connect:()=>{}};}createOscillator(){return{frequency:audioParam(),connect:()=>{},disconnect:()=>{},start:()=>soundStarts++,stop:()=>{}};}};
+unlockGameAudio();soundMuted=false;gameAudio.currentTime=1;playHitSound('petal');playHitSound('player');if(soundStarts!==2)throw Error('Missing hit sounds');toggleGameSound();gameAudio.currentTime=2;playHitSound('petal');if(soundStarts!==2)throw Error('Muted audio played');toggleGameSound();playHitSound('petal');if(soundStarts!==3)throw Error('Unmuted audio did not resume');
+const soundCalls={petal:0,player:0},soundFunction=playHitSound;playHitSound=kind=>soundCalls[kind]++;
+s.garden=1;s.wave=1;s.waveTrait=null;s.loadout=[{t:0,r:0}];s.research=fresh().research;s.level=1;clearArena();spawnClock=100;hp=maxHP();
+enemies=Array.from({length:2},()=>({x:player.x+28.99,y:player.y,r:12,hp:1e8,max:1e8,speed:0,kind:0,t:0,hit:0,slow:0}));
+update(.001);if(enemies.some(e=>e.comboHits!==1)||soundCalls.player!==2)throw Error('Simultaneous contacts did not both register');const hpAfterDoubleHit=hp;update(.001);if(hp<hpAfterDoubleHit)throw Error('Per-enemy hit cooldown changed');
+clearArena();spawnClock=100;angle=-.001*1.8;enemies=[{x:player.x+57,y:player.y,r:12,hp:1e8,max:1e8,speed:0,kind:0,t:0,hit:0,slow:0}];update(.001);if(!soundCalls.petal)throw Error('Petal collision did not trigger sound');playHitSound=soundFunction;
+console.log('PASS: distinct hit sounds, mute control, petal collision audio, and simultaneous mob damage without changing per-mob combos');
 save();console.log('PASS: combat, drawing, six boss transitions, inventory, XP, research rendering, rebirth and saving');
 `,box);
+
 
 
 
