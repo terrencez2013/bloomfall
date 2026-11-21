@@ -88,7 +88,7 @@ for(const [ox,oy] of [[6,0],[-6,0],[0,6],[0,-6]]){
   if(ox&&(mob.x-beforeX)*ox<=0||oy&&(mob.y-beforeY)*oy<=0)throw Error('Petal knockback must follow contact direction');
 }
 console.log('PASS: petal contact knocks mobs away from hits on all four sides');
-if(RARITIES.length!==13||RC.length!==13||MAX_RARITY!==12)throw Error('Expected thirteen complete rarity definitions');
+if(RARITIES.length!==18||RC.length!==18||MAX_RARITY!==17)throw Error('Expected eighteen complete rarity definitions');
 s.bestLevel=1;s.research.slots=0;s.loadout=fresh().loadout;petalState=[];
 for(let r=7;r<MAX_RARITY;r++){
   s.inventory=[{t:2,r,n:5}];recipe=[2,r];
@@ -98,12 +98,12 @@ for(let r=7;r<MAX_RARITY;r++){
   craftBatch(false);
   if(!item(2,r+1)||item(2,r+1).n!==1||item(2,r).n!==0)throw Error('New rarity crafting failed');
 }
-s.inventory=[{t:2,r:12,n:5}];recipe=[2,12];renderCollection();renderCrafting();craftBatch(true);
-if(canMerge(item(2,12))||!$('craft-one').disabled||item(2,12).n!==5||$('collection').innerHTML.includes('undefined'))throw Error('Maximum rarity not handled');
+s.inventory=[{t:2,r:MAX_RARITY,n:5}];recipe=[2,MAX_RARITY];renderCollection();renderCrafting();craftBatch(true);
+if(canMerge(item(2,MAX_RARITY))||!$('craft-one').disabled||item(2,MAX_RARITY).n!==5||$('collection').innerHTML.includes('undefined'))throw Error('Maximum rarity not handled');
 s.inventory=[{t:0,r:0,n:5}];if(canMerge(item(0,0)))throw Error('Equipped copies must not enable glow');
-s.garden=30;s.inventory=[];rollMobLoot({boss:true,kind:0});if(s.inventory.some(p=>p.r!==12))throw Error('Late-game loot does not reach new rarity cap');
+s.garden=40;s.inventory=[];rollMobLoot({boss:true,kind:0});if(s.inventory.some(p=>p.r!==MAX_RARITY))throw Error('Late-game loot does not reach new rarity cap');
 for(let kind=0;kind<4;kind++)drawMob({x:w/2,y:h/2,r:20,kind,boss:false,t:1,hit:0,tier:0});
-console.log('PASS: thirteen rarities, five new crafting tiers, maximum-tier handling, glow eligibility, late-game drops and enhanced bug rendering');
+console.log('PASS: eighteen rarities, higher crafting tiers, maximum-tier handling, glow eligibility, late-game drops and enhanced bug rendering');
 s.garden=1;s.wave=1;s.loadout=[{t:0,r:0}];clearArena();spawnClock=100;spawn(true);
 const dashBoss=enemies[0];dashBoss.x=player.x-300;dashBoss.y=player.y;dashBoss.cool=0;
 update(.01);if(dashBoss.charge||dashBoss.dashWindup)throw Error('Boss dashed outside its radius');
@@ -122,8 +122,19 @@ s.loadout[0]={t:16,r:0};clearArena();damagePetal(0,1e6);if(petalLife(0).cool!==4
 s.loadout=[{t:12,r:0}];clearArena();updateAbilities(.01,57);const heavyBeetle=summons[0];if(heavyBeetle.r!==18||heavyBeetle.mass!==6||heavyBeetle.hp!==72)throw Error('Broodbud heavy summon stats');
 enemies=[{x:heavyBeetle.x+20,y:heavyBeetle.y,r:12,hp:1000,max:1000,speed:0,kind:0,t:0,hit:0,slow:0}];const beforeShove=enemies[0].x;updateAbilities(.01,57);if(enemies[0].x<=beforeShove)throw Error('Summon mass does not shove mobs');draw();
 console.log('PASS: Cactus health and rarity scaling, Rose consumption without losing inventory, four-second reloads, and heavy Broodbud shove');
+s.level=1;s.garden=1;s.wave=1;s.waveTrait=null;s.research=fresh().research;s.loadout=[{t:0,r:0}];
+function contactDamageAt(distance){clearArena();spawnClock=100;hp=maxHP();const e={x:player.x+distance,y:player.y,r:12,hp:1e8,max:1e8,speed:0,kind:0,t:0,hit:0,slow:0};enemies=[e];update(.001);return hp<maxHP();}
+if(!contactDamageAt(29.5)||contactDamageAt(30.5))throw Error('Mob contact range must be exactly one pixel larger');
+s.loadout=[{t:12,r:0}];clearArena();spawnClock=100;updateAbilities(.001,57);
+const solidBeetle=summons[0];enemies=[{x:player.x+120,y:player.y,r:20,hp:1e9,max:1e9,speed:35,kind:0,t:0,hit:0,slow:0}];
+for(let j=0;j<100;j++){update(.02);if(Math.hypot(solidBeetle.x-enemies[0].x,solidBeetle.y-enemies[0].y)<solidBeetle.r+enemies[0].r-.001)throw Error('Summon phases during combat');}
+if(enemies[0].hp>=1e9)throw Error('Solid summon no longer attacks');
+enemies[0].x=solidBeetle.x;enemies[0].y=solidBeetle.y;resolveSummonCollisions();if(Math.hypot(solidBeetle.x-enemies[0].x,solidBeetle.y-enemies[0].y)<solidBeetle.r+enemies[0].r)throw Error('Exact-center overlap not resolved');
+solidBeetle.x=18;solidBeetle.y=200;enemies[0].x=38;enemies[0].y=200;enemies[0].r=38;enemies[0].boss=true;resolveSummonCollisions();if(Math.hypot(solidBeetle.x-enemies[0].x,solidBeetle.y-enemies[0].y)<56)throw Error('Wall collision phases into boss');
+console.log('PASS: one-pixel contact-range extension and solid summon collision during pursuit, overlap and wall contact');
 save();console.log('PASS: combat, drawing, six boss transitions, inventory, XP, research rendering, rebirth and saving');
 `,box);
+
 
 
 
