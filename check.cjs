@@ -148,7 +148,7 @@ if(k===5){bossSpecial(b,170,0,170);bossSpecial(b,170,0,170);if(!bossFields.some(
 draw();}
 clearArena();s.garden=1;hp=maxHP();spawn(true);const trapBoss=enemies[0];bossField(trapBoss,'thorns',player.x,player.y,40,.5,2);const safeHP=hp;updateBossFields(.2);if(hp!==safeHP)throw Error('Telegraph dealt damage');updateBossFields(.31);updateBossFields(.01);if(hp>=safeHP)throw Error('Active thorn trap did not hit');bossField(trapBoss,'web',player.x,player.y,40,0,2);if(bossTerrainSpeed()!==.55)throw Error('Web slow missing');trapBoss.dead=true;updateBossFields(.01);if(bossFields.length)throw Error('Dead boss left active hazards');
 console.log('PASS: five hits per second, per-mob additive damage and one-second reset, six boss patterns, warnings, slows and hazard cleanup');
-let soundStarts=0;
+let soundStarts=0,toneStarts=0;
 const audioParam=()=>({value:0,setValueAtTime:()=>{},exponentialRampToValueAtTime:()=>{}});
 window.AudioContext=class{
 constructor(){this.state='running';this.currentTime=0;this.sampleRate=24000;this.destination={};}
@@ -156,9 +156,10 @@ createGain(){return{gain:audioParam(),connect:()=>{},disconnect:()=>{}};}
 createDynamicsCompressor(){return{threshold:audioParam(),ratio:audioParam(),connect:()=>{}};}
 createBuffer(channels,length){const data=new Float32Array(length);return{length,getChannelData:()=>data};}
 createBiquadFilter(){return{frequency:audioParam(),Q:audioParam(),connect:()=>{},disconnect:()=>{}};}
+createOscillator(){return{frequency:audioParam(),connect:()=>{},disconnect:()=>{},start:()=>toneStarts++,stop:()=>{}};}
 createBufferSource(){return{playbackRate:audioParam(),connect:()=>{},disconnect:()=>{},start:()=>soundStarts++,stop:()=>{}};}
 };
-unlockGameAudio();soundMuted=false;gameAudio.currentTime=1;playHitSound('petal');playHitSound('player');if(soundStarts!==2)throw Error('Missing hit sounds');toggleGameSound();gameAudio.currentTime=2;playHitSound('petal');if(soundStarts!==2)throw Error('Muted audio played');toggleGameSound();playHitSound('petal');if(soundStarts!==3)throw Error('Unmuted audio did not resume');if(gameAudioBus.gain.value!==.055)throw Error('Audio volume not reduced');for(const kind of ['petal','player']){const data=mulchBuffers[kind].getChannelData(0);if(!data.some(n=>Math.abs(n)>.01)||data.some(n=>!Number.isFinite(n)||Math.abs(n)>1))throw Error('Invalid mulch crunch buffer');}
+unlockGameAudio();soundMuted=false;gameAudio.currentTime=1;playHitSound('petal');playHitSound('player');if(soundStarts!==2)throw Error('Missing hit sounds');toggleGameSound();gameAudio.currentTime=2;playHitSound('petal');if(soundStarts!==2)throw Error('Muted audio played');toggleGameSound();playHitSound('petal');if(soundStarts!==3)throw Error('Unmuted audio did not resume');if(gameAudioBus.gain.value!==.025)throw Error('Audio volume not reduced');for(const kind of ['petal','player']){const data=mulchBuffers[kind].getChannelData(0);if(!data.some(n=>Math.abs(n)>.01)||data.some(n=>!Number.isFinite(n)||Math.abs(n)>1))throw Error('Invalid mulch crunch buffer');}
 const soundCalls={petal:0,player:0},soundFunction=playHitSound;playHitSound=kind=>soundCalls[kind]++;
 s.garden=1;s.wave=1;s.waveTrait=null;s.loadout=[{t:0,r:0}];s.research=fresh().research;s.level=1;clearArena();spawnClock=100;hp=maxHP();
 enemies=Array.from({length:2},()=>({x:player.x+28.99,y:player.y,r:12,hp:1e8,max:1e8,speed:0,kind:0,t:0,hit:0,slow:0}));
@@ -174,8 +175,11 @@ for(const [x,y] of [[w/2,h/2],[25,200],[w-25,200],[200,70],[200,h-50]]){
 clearArena();const rush={x:player.x+200,y:player.y,r:38,hp:1e6,boss:true};stopMobTunnel(rush,player.x-200,player.y,player.x,player.y);if(rush.x>player.x-55+.001)throw Error('Fast dash tunneled through flower');
 enemies=[rush];resolvePlayerCollisions();if(Math.hypot(player.x-rush.x,player.y-rush.y)<55)throw Error('Dash contact separation');
 console.log('PASS: solid player/enemy bodies, wall separation, and fast-dash tunneling prevention');
+s.loadout=[{t:0,r:0}];clearArena();soundMuted=false;const tonesBefore=toneStarts;damagePetal(0,1);if(toneStarts!==tonesBefore)throw Error('Nonlethal damage played a break tone');damagePetal(0,10000);if(toneStarts!==tonesBefore+1)throw Error('Petal break tone missing');damagePetal(0,10000);if(toneStarts!==tonesBefore+1)throw Error('Broken petal repeated its tone');soundMuted=true;playPetalBreakSound();if(toneStarts!==tonesBefore+1)throw Error('Muted break tone played');soundMuted=false;s.loadout=[{t:18,r:0}];clearArena();damagePetal(0,Infinity);if(toneStarts!==tonesBefore+1)throw Error('Unbreakable petal played a break tone');
+console.log('PASS: lower sound volume, electronic tone only when a petal breaks, and mute support');
 save();console.log('PASS: combat, drawing, six boss transitions, inventory, XP, research rendering, rebirth and saving');
 `,box);
+
 
 
 

@@ -1,4 +1,4 @@
-const HIT_VOLUME=.055;
+const HIT_VOLUME=.025;
 let gameAudio=null,gameAudioBus=null,mulchBuffers=null,crunchVariation=0,soundMuted=false,lastPetalSound=-Infinity,lastPlayerSound=-Infinity;
 try{soundMuted=localStorage.getItem('bloomfall-muted')==='true';}catch{}
 // Short irregular noise grains imitate mulch and dry leaf crunches.
@@ -29,6 +29,16 @@ function playHitSound(kind){
     gain.gain.value=petal?.65:.85;
     source.connect(filter);filter.connect(gain);gain.connect(gameAudioBus);source.start(now);source.stop(now+.24);
     source.onended=()=>{source.disconnect();filter.disconnect();gain.disconnect();};
+  }catch{}
+}
+function playPetalBreakSound(){
+  if(soundMuted||!gameAudio||gameAudio.state!=='running')return;
+  try{
+    const now=gameAudio.currentTime,osc=gameAudio.createOscillator(),gain=gameAudio.createGain();
+    osc.type='triangle';osc.frequency.setValueAtTime(640,now);osc.frequency.exponentialRampToValueAtTime(180,now+.09);
+    gain.gain.setValueAtTime(.001,now);gain.gain.exponentialRampToValueAtTime(.22,now+.003);gain.gain.exponentialRampToValueAtTime(.001,now+.11);
+    osc.connect(gain);gain.connect(gameAudioBus);osc.start(now);osc.stop(now+.12);
+    osc.onended=()=>{osc.disconnect();gain.disconnect();};
   }catch{}
 }
 document.addEventListener('DOMContentLoaded',()=>{document.getElementById('sound-toggle').onclick=toggleGameSound;renderSoundButton();});
